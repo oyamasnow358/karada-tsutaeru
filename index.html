@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<!--
+  © 2026 MieeL（ミエル） https://www.mieel-support-school.com/  All rights reserved.
+  学校・家庭・療育機関などで子どもの学習に使うこと、作ったプリントを印刷して配ることは自由です。
+  プログラム・画像・文章の無断転載・複製、改変しての公開・再配布、販売はお断りします（くわしくは LICENSE.md）。
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="からだ">
+<meta name="theme-color" content="#F0FAF6">
+<title>からだ つたえる｜MieeL</title>
+<style>
+  /* ============================================================
+     MieeL アプリ きょうつう（base.css）
+     ============================================================ */
+  :root {
+    --mieel: radial-gradient(circle at 50% 0%,#1B8FE8 0%,#2BB8D6 28%,#3FCB9E 45%,#8FD24A 58%,#F4D027 72%,#F7941E 100%);
+    --ink: #1F2937; --sub: #6B7280;
+    --go: #2F9E44; --go-d: #237A34; --blue: #1C7ED6; --blue-d: #1864AB; --orange: #F76707; --gold: #FAB005; --red: #E03131; --pink: #F06595; --teal: #0CA678; --violet: #7048E8;
+    --emo: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Hiragino Maru Gothic ProN", "ヒラギノ丸ゴ ProN", "BIZ UDPGothic", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    font-weight: 700; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    touch-action: manipulation; overscroll-behavior: none;
+    display: flex; flex-direction: column; height: 100vh; height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overflow-x: hidden;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+  input, textarea, select { -webkit-user-select: text; user-select: text; }
+  .emo { font-family: var(--emo); font-weight: 400; line-height: 1; }
+
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; min-height: 64px; }
+  .chip { display: flex; align-items: center; gap: 6px; padding: 4px 14px 4px 8px; border-radius: 999px; background: #fff; border: 3px solid var(--line); font-size: 19px; white-space: nowrap; }
+  .chip .emo { font-size: 26px; }
+  .chip.home { border-color: var(--line); color: var(--ink); position: relative; overflow: hidden; touch-action: none; }
+  .chip.home i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: rgba(0,0,0,.12); }
+  .chip.home.pressing i { width: 100%; transition: width 1.2s linear; }
+  .chip.home span { position: relative; }
+  .brand { flex: 1; display: flex; justify-content: center; align-items: center; gap: 14px; color: var(--sub); font-size: 16px; letter-spacing: .1em; min-width: 0; }
+  .mieel-brand { display: flex; align-items: center; gap: 7px; white-space: nowrap; flex: none; }
+  .orb-mini { width: 22px; height: 22px; border-radius: 50%; background: var(--mieel); flex: none; }
+  .mieel-brand strong { font-size: 16px; color: var(--ink); }
+  .mieel-brand .url { font-size: 12px; color: var(--sub); font-weight: 600; }
+  .mieel-foot { margin-top: 28px; padding-top: 16px; border-top: 1px solid #E9ECEF; text-align: center; color: var(--sub); font-size: 13px; line-height: 1.8; }
+  .mieel-foot .mieel-brand { justify-content: center; }
+  .mieel-foot a { color: #1C7ED6; font-weight: 700; text-decoration: none; font-size: 14px; }
+  .gear { position: relative; width: 52px; height: 52px; border-radius: 50%; border: none; background: transparent; opacity: .35; font-size: 26px; display: grid; place-items: center; }
+  .gear::after { content: ""; position: absolute; inset: 2px; border-radius: 50%; border: 4px solid transparent; }
+  .gear.pressing { opacity: 1; }
+  .gear.pressing::after { border-color: var(--blue); animation: ring 1.5s linear forwards; }
+  @keyframes ring { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+  main { flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 0 16px 12px; }
+  .screen { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow-y: auto; gap: clamp(8px, 1.4vh, 14px); animation: fadein .25s ease-out; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+  @keyframes pulse { to { transform: scale(1.05); } }
+  .shake { animation: shake .45s; }
+  .title { font-size: clamp(24px, 3.4vw, 42px); text-align: center; margin: 0; line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; }
+  .title small { display: block; font-size: .5em; color: var(--sub); }
+  .actions { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .big-btn { min-width: min(260px, 78vw); min-height: 76px; padding: 0 26px; border: none; border-radius: 999px; color: #fff; font-size: clamp(20px, 2.9vw, 32px); display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+  .big-btn.go { background: var(--go); box-shadow: 0 8px 0 var(--go-d); }
+  .big-btn.blue { background: var(--blue); box-shadow: 0 8px 0 var(--blue-d); }
+  .big-btn.white { background: #fff; color: var(--ink); box-shadow: 0 8px 0 var(--line); border: 4px solid var(--line); }
+  .big-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .big-btn[disabled] { opacity: .35; pointer-events: none; }
+  .mid-btn { min-height: 54px; padding: 0 18px; border-radius: 999px; border: 4px solid var(--line); background: #fff; font-size: clamp(15px, 1.9vw, 20px); box-shadow: 0 5px 0 var(--line); display: inline-flex; align-items: center; gap: 8px; }
+  .mid-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--line); }
+  .mid-btn.on { background: #FFF3BF; border-color: var(--gold); }
+  .menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 44vw), 1fr)); gap: 14px; width: min(1000px, 100%); }
+  .mcard { background: #fff; border: 6px solid var(--c); border-radius: 30px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; box-shadow: 0 7px 0 var(--c); position: relative; overflow: hidden; }
+  .mcard .emo { font-size: clamp(46px, 7.5vh, 76px); }
+  .mcard b { font-size: clamp(19px, 2.5vw, 28px); color: var(--c); }
+  .mcard small { font-size: clamp(13px, 1.6vw, 17px); color: var(--sub); }
+  .mcard:active { transform: translateY(5px); box-shadow: 0 2px 0 var(--c); }
+  .mcard .lp { position: absolute; left: 0; bottom: 0; height: 8px; width: 0; background: var(--c); }
+  .mcard.pressing .lp { width: 100%; transition: width 1s linear; }
+  .home { align-items: center; }
+  .home > :first-child { margin-top: auto; } .home > :last-child { margin-bottom: auto; }
+  .note-box { font-size: 14px; color: var(--sub); text-align: center; background: #fff; border-radius: 14px; padding: 8px 14px; border: 2px dashed var(--line); }
+  .center { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(8px, 2vh, 18px); text-align: center; }
+  .praise { position: fixed; left: 50%; top: 38%; transform: translate(-50%, -50%); font-size: clamp(50px, 8.6vw, 110px); font-weight: 900; color: var(--orange); white-space: nowrap; -webkit-text-stroke: 5px #fff; paint-order: stroke fill; pointer-events: none; z-index: 40; animation: praise 1.2s ease-out forwards; }
+  @keyframes praise { 0% { transform: translate(-50%, -50%) scale(.3); opacity: 0; } 22% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; } 70% { transform: translate(-50%, -54%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -70%); opacity: 0; } }
+  .stars { font-size: clamp(56px, 11vh, 104px); letter-spacing: 8px; }
+  .stars span { display: inline-block; animation: spinin .7s cubic-bezier(.2, 1.4, .4, 1) both; font-family: var(--emo); }
+  .stars span.off { filter: grayscale(1); opacity: .25; }
+  @keyframes spinin { from { transform: rotate(-360deg) scale(0); } to { transform: none; } }
+  .pic { position: relative; display: grid; place-items: center; overflow: hidden; background: #fff; }
+  .pic img { width: 100%; height: 100%; object-fit: cover; }
+  .pic .emo { font-size: var(--es, 60px); }
+  .quit { position: relative; overflow: hidden; border: 2px solid #DEE2E6; background: #fff; color: #868E96; font-size: 15px; padding: 9px 13px; border-radius: 999px; touch-action: none; }
+  .quit i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #FFE3E3; }
+  .quit span { position: relative; }
+  .quit.pressing { color: #E03131; border-color: #FFA8A8; }
+  .quit.pressing i { width: 100%; transition: width 1.5s linear; }
+  .ov { position: fixed; inset: 0; z-index: 45; background: rgba(255, 255, 255, .97); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; animation: fadein .25s; text-align: center; overflow-y: auto; }
+
+  body.calm *, body.calm *::before, body.calm *::after { animation: none !important; transition: none !important; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+  @media (max-width: 600px), (max-height: 520px) {
+    .topbar { min-height: 50px; padding: 4px 8px; gap: 6px; }
+    .topbar .appname, .topbar .url, .chip .lbl { display: none; }
+    .chip { font-size: 15px; padding: 2px 8px 2px 6px; border-width: 2px; } .chip .emo { font-size: 20px; }
+    .gear { width: 42px; height: 42px; font-size: 21px; }
+    main { padding: 0 8px 8px; }
+    .title { font-size: 21px; }
+    .big-btn { min-width: 0; min-height: 56px; padding: 0 18px; font-size: 19px; box-shadow: 0 5px 0 var(--go-d); }
+    .big-btn.blue { box-shadow: 0 5px 0 var(--blue-d); } .big-btn.white { box-shadow: 0 5px 0 var(--line); }
+    .mid-btn { min-height: 44px; padding: 0 12px; font-size: 14px; }
+    .menu { grid-template-columns: 1fr 1fr; gap: 10px; } .mcard { border-width: 4px; box-shadow: 0 5px 0 var(--c); border-radius: 22px; padding: 10px 6px; }
+  }
+
+  /* ---------- 先生用：設定 ---------- */
+  .modal { position: fixed; inset: 0; z-index: 50; background: rgba(17, 24, 39, .55); display: none; align-items: flex-start; justify-content: center; padding: 24px 12px; overflow-y: auto; -webkit-user-select: text; user-select: text; }
+  .modal.open { display: flex; }
+  .panel { width: min(100%, 900px); background: #fff; border-radius: 24px; padding: 22px clamp(14px, 4vw, 32px) 28px; font-weight: 400; font-size: 17px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .panel h2 { margin: 0; font-size: 25px; font-weight: 700; }
+  .panel h3 { margin: 28px 0 10px; font-size: 20px; font-weight: 700; padding-left: 10px; border-left: 6px solid var(--accent, var(--blue)); }
+  .panel h4 { margin: 14px 0 4px; }
+  .note { color: var(--sub); font-size: 15px; line-height: 1.6; margin: 6px 0; }
+  .panel label.row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; border-bottom: 1px solid #F1F3F5; }
+  .panel label.row > span:first-child { flex: 1; }
+  .panel input[type=text], .panel select, .panel textarea { font: inherit; font-size: 17px; padding: 9px 12px; border: 2px solid #CED4DA; border-radius: 12px; background: #fff; }
+  .panel textarea { width: 100%; min-height: 110px; line-height: 1.6; }
+  .panel input[type=checkbox] { width: 28px; height: 28px; accent-color: var(--go); }
+  .panel input[type=range] { width: 200px; }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: none; border-radius: 12px; padding: 11px 18px; font-size: 16px; font-weight: 700; background: #E9ECEF; color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--blue); color: #fff; } .btn.ok { background: var(--go); color: #fff; } .btn.warn { background: #FFF0F0; color: #C92A2A; }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button { flex: 1; min-width: 86px; padding: 10px 8px; font-size: 15px; font-weight: 700; border-radius: 12px; border: 2px solid #CED4DA; background: #fff; }
+  .seg button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .srow { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #F1F3F5; }
+  @media (max-width: 600px) { .srow { grid-template-columns: 1fr; } }
+  .prow { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid #E9ECEF; border-radius: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+  .mini-btn { min-width: 40px; height: 40px; border-radius: 10px; border: none; background: #F1F3F5; font-size: 16px; padding: 0 10px; }
+  .mini-btn.warn { background: #FFF0F0; color: #C92A2A; }
+  .rec-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .rec-table th, .rec-table td { border-bottom: 1px solid #E9ECEF; padding: 6px 4px; text-align: left; vertical-align: top; }
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: rgba(17,24,39,.9); color: #fff; padding: 14px 22px; border-radius: 14px; font-size: 18px; z-index: 60; display: none; max-width: 90vw; text-align: center; }
+  .toast.show { display: block; }
+  .lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+  .lib button { background: #fff; border: 3px solid var(--line); border-radius: 16px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 14px; }
+  .lib button .emo { font-size: 38px; }
+  .lib h4 { grid-column: 1 / -1; margin: 6px 0 0; color: var(--sub); }
+
+  /* ---------- プリント（A4） ---------- */
+  #printRoot { display: none; }
+  .ppage { flex: none; width: 210mm; height: 297mm; padding: 12mm 13mm 10mm; box-sizing: border-box; background: #fff; color: #111; position: relative; overflow: hidden; font-family: "BIZ UDPGothic", "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif; font-weight: 700; display: flex; flex-direction: column; gap: 3mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ppage .phd { display: flex; align-items: flex-end; justify-content: space-between; border-bottom: .8mm solid #111; padding-bottom: 2mm; gap: 4mm; }
+  .ppage .phd h1 { margin: 0; font-size: 7.5mm; }
+  .ppage .phd small { font-size: 3.8mm; font-weight: 400; display: block; }
+  .ppage .nm { font-size: 5mm; border-bottom: .4mm solid #111; min-width: 50mm; padding: 0 2mm 1mm; white-space: nowrap; }
+  .ppage .pf { margin-top: auto; text-align: right; font-size: 3mm; color: #888; }
+  .ppage .pe { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-weight: 400; }
+  @media print {
+    @page { size: A4 portrait; margin: 0; }
+    html, body { height: auto !important; overflow: visible !important; display: block !important; background: #fff !important; padding: 0 !important; }
+    body > *:not(#printRoot) { display: none !important; }
+    #printRoot { display: block !important; }
+    #printRoot .ppage { page-break-after: always; break-after: page; }
+    #printRoot .ppage:last-child { page-break-after: auto; break-after: auto; }
+  }
+
+  /* ---------- 🖨️ プリントの 画面 ---------- */
+  .panel.wide { width: min(100%, 1180px); }
+  .seglabel { margin: 12px 0 6px; font-weight: 700; font-size: 15px; }
+  .prgrid { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 18px; margin-top: 10px; }
+  .prctl .seg button { min-width: 0; }
+  .prctl .seg.types { flex-direction: column; }
+  .prctl .seg.types button { text-align: left; padding: 10px 14px; }
+  .btn.blue { background: #1C7ED6; color: #fff; }
+  .prprev { background: #E9ECEF; border-radius: 16px; padding: 12px; max-height: 76vh; overflow-y: auto; }
+  .pwrap { margin: 0 auto 14px; box-shadow: 0 4px 14px rgba(0,0,0,.18); overflow: hidden; background: #fff; }
+  .pwrap .ppage { transform-origin: top left; }
+  @media (max-width: 820px) { .prgrid { grid-template-columns: 1fr; } }
+
+  /* ============================================================
+     からだ つたえる
+     ============================================================ */
+  :root { --bg: #F0FAF6; --line: #CDEBDF; --accent: #0CA678; }
+  .brand { color: #5FA88C; }
+  .step { gap: 8px; }
+  .shead { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+  .shead .ask { flex: 1; text-align: center; font-size: clamp(22px, 3.2vw, 36px); font-weight: 700; }
+  .back { min-width: 90px; }
+  .sdots { display: flex; gap: 6px; justify-content: center; }
+  .sdots i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); } .sdots i.on { background: var(--accent); }
+
+  /* からだ マップ */
+  .mapwrap { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 34%); gap: 14px; }
+  .bodies { display: flex; gap: 10px; justify-content: center; min-height: 0; }
+  .bodies .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; min-height: 0; }
+  .bodies .bd b { font-size: 15px; color: var(--sub); }
+  .bodies svg { width: 100%; height: 100%; max-height: 66vh; flex: 1; min-height: 0; }
+  svg .pt { fill: #FFE3C8; stroke: #D9A47A; stroke-width: 2.5; cursor: pointer; transition: fill .15s; }
+  svg .pt.f { fill: #FFD3B0; }
+  svg .pt:hover { fill: #FFC9A0; }
+  svg .pt.on { fill: #FF6B6B; stroke: #C92A2A; animation: throb 1s ease-in-out infinite; }
+  @keyframes throb { 50% { fill: #FFA8A8; } }
+  .plist { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; overflow-y: auto; }
+  .plist button { border: 3px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: clamp(15px, 1.8vw, 19px); }
+  .plist button.on { background: #FF6B6B; border-color: #C92A2A; color: #fff; }
+
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 42vw), 1fr)); gap: 12px; width: min(1000px, 100%); margin: auto; }
+  .opts button { background: #fff; border: 5px solid var(--line); border-radius: 24px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: clamp(18px, 2.4vw, 26px); box-shadow: 0 6px 0 var(--line); }
+  .opts button .emo { font-size: clamp(46px, 8vh, 76px); }
+  .opts button small { font-size: 13px; color: var(--sub); }
+  .opts button:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--line); }
+  .scale { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; width: min(1100px, 100%); margin: auto; }
+  .scale button { border: 5px solid var(--sc); background: #fff; border-radius: 22px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: clamp(13px, 1.7vw, 18px); box-shadow: 0 6px 0 var(--sc); }
+  .scale button .emo { font-size: clamp(44px, 8vw, 84px); }
+  .scale button b { font-size: clamp(22px, 3vw, 34px); color: var(--sc); }
+  .scale button:active { transform: translateY(4px); }
+  .scalebar { height: 14px; border-radius: 99px; background: linear-gradient(90deg, #40C057, #FAB005, #FA5252); width: min(1100px, 100%); margin: 0 auto; }
+
+  /* つたえる カード */
+  .tell { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .tcard { background: #fff; border: 8px solid var(--accent); border-radius: 40px; padding: clamp(14px, 3vw, 36px); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(12px, 3vw, 36px); align-items: center; width: min(1000px, 100%); }
+  .tcard svg { width: clamp(110px, 20vw, 220px); height: auto; }
+  .tcard .msg { font-size: clamp(28px, 4.6vw, 58px); font-weight: 800; line-height: 1.45; }
+  .tcard .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: clamp(16px, 2vw, 22px); }
+  .tcard .meta span { background: #F1F3F5; border-radius: 999px; padding: 4px 12px; }
+
+  /* カード */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 30vw), 1fr)); gap: 10px; width: 100%; }
+  .cards button { background: #fff; border: 4px solid var(--cc, var(--line)); border-radius: 22px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: clamp(15px, 1.9vw, 20px); line-height: 1.3; }
+  .cards button .pic { width: 70%; aspect-ratio: 1; border-radius: 14px; --es: clamp(44px, 7vh, 66px); background: transparent; }
+  .cards button:active { transform: scale(.97); }
+  .bigcard { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  .bigcard .pic { width: min(56vw, 46vh); aspect-ratio: 1; border-radius: 40px; --es: min(36vw, 30vh); background: #fff; border: 8px solid var(--cc, var(--accent)); }
+  .bigcard .t { font-size: clamp(34px, 6vw, 72px); font-weight: 800; text-align: center; }
+
+  /* びょういん れんしゅう */
+  .rh { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(12px, 2vw, 26px); align-items: center; }
+  .rh .pic { width: 100%; aspect-ratio: 4 / 3; border-radius: 30px; --es: clamp(100px, 20vh, 200px); background: #fff; border: 6px solid var(--line); max-height: 60vh; }
+  .rh .t { font-size: clamp(24px, 3.6vw, 44px); line-height: 1.5; }
+  .rh .do { margin-top: 10px; font-size: clamp(19px, 2.6vw, 30px); color: #087F5B; background: #E6FCF5; border-radius: 18px; padding: 8px 14px; }
+  .act { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .breath { width: clamp(120px, 22vh, 200px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #96F2D7, #20C997); display: grid; place-items: center; color: #fff; font-size: clamp(22px, 3vw, 32px); font-weight: 800; transition: transform 3s ease-in-out; }
+  .breath.in { transform: scale(1.35); }
+  .cnt { font-size: clamp(70px, 14vh, 140px); font-weight: 900; color: var(--accent); line-height: 1; }
+
+  @media (orientation: portrait) {
+    .mapwrap { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; }
+    .plist { max-height: 22vh; justify-content: center; }
+    .rh { grid-template-columns: 1fr; } .rh .pic { max-height: 34vh; }
+    .tcard { grid-template-columns: 1fr; justify-items: center; text-align: center; } .tcard .meta { justify-content: center; }
+  }
+  @media (max-width: 600px), (max-height: 520px) {
+    .scale { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .scale button { border-width: 4px; padding: 4px; box-shadow: 0 4px 0 var(--sc); }
+    .opts button { border-width: 4px; padding: 6px; } .opts { gap: 8px; }
+    .tcard { border-width: 5px; border-radius: 26px; }
+    .shead .ask { font-size: 19px; } .back { min-width: 0; }
+    .plist button { padding: 4px 9px; font-size: 14px; }
+    .breath { width: 96px; font-size: 18px; } .cnt { font-size: 60px; } .rh .t { font-size: 19px; } .rh .do { font-size: 16px; margin-top: 6px; } .rh .pic { max-height: 26vh; }
+    .act .mid-btn { min-height: 38px; }
+  }
+  @media (max-height: 520px) and (orientation: landscape) {
+    .scale { grid-template-columns: repeat(6, minmax(0, 1fr)); } .scale button .emo { font-size: 34px; }
+    .opts button .emo { font-size: 34px; } .opts button { font-size: 15px; }
+    .mapwrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .tcard svg { width: 90px; } .tcard .msg { font-size: 22px; }
+    .rh .pic { max-height: 52vh; } .rh .t { font-size: 17px; } .rh .do { font-size: 14px; }
+    .breath { width: 70px; font-size: 15px; } .cnt { font-size: 44px; } .act { gap: 4px; }
+    .opts { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; } .opts button { padding: 4px 2px; box-shadow: 0 3px 0 var(--line); }
+    .tcard { padding: 8px 14px; } .tcard .meta { margin-top: 4px; font-size: 14px; }
+    .big-btn { min-height: 46px; }
+  }
+
+  /* プリント */
+  .pcards { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); gap: 0; flex: 1; min-height: 0; border: .3mm dashed #999; }
+  .pcards .pc { border: .3mm dashed #999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3mm; overflow: hidden; }
+  .pcards .pc .ph { width: 48mm; height: 48mm; display: grid; place-items: center; overflow: hidden; border-radius: 4mm; }
+  .pcards .pc .ph img { width: 100%; height: 100%; object-fit: cover; }
+  .pcards .pc .ph .pe { font-size: 32mm; line-height: 1; }
+  .pcards .pc .t { font-size: 8mm; font-weight: 700; text-align: center; line-height: 1.3; padding: 0 3mm; }
+  .pmap { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; height: 128mm; margin-bottom: 2mm; }
+  .pmap > div { height: 128mm; min-height: 0; } .pmap svg { width: 100%; height: 100%; display: block; }
+  .pmap .pt { fill: #fff; stroke: #333; stroke-width: 2; }
+  .pmap .pt.f { fill: #fff; }
+  .pmw { display: flex; flex-wrap: wrap; gap: 2mm 3mm; font-size: 5mm; margin-top: 3mm; }
+  .pmw span { border: .3mm solid #333; border-radius: 3mm; padding: .5mm 2.5mm; }
+  .psc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2mm; margin-top: 4mm; text-align: center; font-size: 4mm; }
+  .psc .pe { font-size: 13mm; display: block; }
+  .plog { width: 100%; border-collapse: collapse; font-size: 4mm; table-layout: fixed; }
+  .plog td:first-child { white-space: nowrap; font-size: 3.6mm; }
+  .plog th, .plog td { border: .3mm solid #555; padding: 1mm 2mm; text-align: left; line-height: 1.35; }
+  .plog th { background: #EEE; }
+
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="chip home" id="homeBtn" type="button" aria-label="さいしょの ページに もどる" hidden><i></i><span class="emo">🏠</span><span class="lbl" id="homeLbl">さいしょ</span></button>
+  <button class="chip" id="whoChip" type="button" hidden></button>
+  <div class="brand"><div class="mieel-brand" aria-label="MieeL"><span class="orb-mini"></span><strong>MieeL</strong><span class="url">mieel-support-school.com</span></div><span class="appname">からだ つたえる</span></div>
+  <span id="extraChips"></span>
+  <button class="chip" id="printBtn" type="button" aria-label="A4プリントを つくる" hidden>🖨️<span class="appname">プリント</span></button>
+  <button class="gear" id="gear" type="button" aria-label="先生用のせってい（ながおし）">⚙️</button>
+</header>
+<main id="view"></main>
+<div class="modal" id="settings" role="dialog" aria-modal="true" aria-label="先生用せってい"><div class="panel" id="settingsPanel"></div></div>
+<div class="modal" id="printModal" role="dialog" aria-modal="true" aria-label="プリント"><div class="panel wide" id="printPanel"></div></div>
+<div class="modal" id="libModal" role="dialog" aria-modal="true" aria-label="えらぶ"><div class="panel" id="libPanel"></div></div>
+<input type="file" id="fileIn" hidden>
+<div class="toast" id="toast"></div>
+<div id="printRoot"></div>
+<script>
+function jaSay(t) {
+  // 読み上げで 単語の あたまの「は」「へ」が 助詞（わ・え）と 読まれないように カタカナに する（はこ→ハこ、へや→ヘや）
+  return String(t == null ? '' : t).replace(/なかまはずれ/g, '仲間外れ').replace(/(^|[\s、。！？!?・（(「『])([はへ])(?=[ぁ-ゖァ-ヺー一-鿿])/g, function (m, a, c) { return a + (c === 'は' ? 'ハ' : 'ヘ'); });
+}
+(function () {
+  'use strict';
+  /* ============================================================
+     からだ つたえる
+     どこが いたい？（からだ マップ）→ どんな かんじ → どのくらい → いつから → つたえる カード
+     ほけんしつ カード ／ びょういん・はいしゃ・けんしん・ちゅうしゃ の れんしゅう
+     ============================================================ */
+  const PARTS = { head: 'あたま', eye: 'め', ear: 'みみ', nose: 'はな', mouth: 'くち', tooth: 'は', throat: 'のど', neck: 'くび', shoulder: 'かた', chest: 'むね', belly: 'おなか', back: 'せなか', waist: 'こし', butt: 'おしり', arm: 'うで', hand: 'て', leg: 'あし', knee: 'ひざ', foot: 'あしの さき', whole: 'からだ ぜんたい' };
+  // [ばしょ, かたち]（viewBox 0 0 300 520）
+  const SH = {
+    arms: [['arm', '<rect x="62" y="148" width="28" height="118" rx="14" transform="rotate(8 76 148)"/>'], ['arm', '<rect x="210" y="148" width="28" height="118" rx="14" transform="rotate(-8 224 148)"/>'],
+      ['hand', '<circle cx="62" cy="280" r="17"/>'], ['hand', '<circle cx="238" cy="280" r="17"/>']],
+    legs: [['leg', '<rect x="106" y="300" width="40" height="98" rx="18"/>'], ['leg', '<rect x="154" y="300" width="40" height="98" rx="18"/>'],
+      ['leg', '<rect x="108" y="418" width="36" height="66" rx="16"/>'], ['leg', '<rect x="156" y="418" width="36" height="66" rx="16"/>'],
+      ['knee', '<circle cx="126" cy="406" r="18"/>'], ['knee', '<circle cx="174" cy="406" r="18"/>'],
+      ['foot', '<ellipse cx="118" cy="496" rx="27" ry="13"/>'], ['foot', '<ellipse cx="182" cy="496" rx="27" ry="13"/>']],
+    front: [['belly', '<rect x="100" y="204" width="100" height="104" rx="22"/>'], ['chest', '<rect x="100" y="138" width="100" height="70" rx="22"/>'],
+      ['shoulder', '<circle cx="98" cy="152" r="21"/>'], ['shoulder', '<circle cx="202" cy="152" r="21"/>'], ['throat', '<rect x="133" y="112" width="34" height="30" rx="9"/>'],
+      ['ear', '<ellipse cx="97" cy="70" rx="11" ry="18"/>'], ['ear', '<ellipse cx="203" cy="70" rx="11" ry="18"/>'], ['head', '<circle cx="150" cy="64" r="52"/>'],
+      ['eye', '<ellipse cx="128" cy="58" rx="11" ry="9"/>', 1], ['eye', '<ellipse cx="172" cy="58" rx="11" ry="9"/>', 1], ['nose', '<ellipse cx="150" cy="78" rx="8" ry="10"/>', 1], ['mouth', '<ellipse cx="150" cy="99" rx="19" ry="8"/>', 1]],
+    back: [['butt', '<rect x="100" y="270" width="100" height="44" rx="22"/>'], ['waist', '<rect x="100" y="228" width="100" height="46" rx="16"/>'], ['back', '<rect x="100" y="138" width="100" height="94" rx="22"/>'],
+      ['shoulder', '<circle cx="98" cy="152" r="21"/>'], ['shoulder', '<circle cx="202" cy="152" r="21"/>'], ['neck', '<rect x="133" y="112" width="34" height="30" rx="9"/>'],
+      ['ear', '<ellipse cx="97" cy="70" rx="11" ry="18"/>'], ['ear', '<ellipse cx="203" cy="70" rx="11" ry="18"/>'], ['head', '<circle cx="150" cy="64" r="52"/>']]
+  };
+  function bodySVG(side, sel) {
+    const list = SH.arms.concat(SH.legs, SH[side]);
+    return '<svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">' + list.map(([p, s, f]) => s.replace(/^<(\w+)/, '<$1 class="pt' + (f ? ' f' : '') + (sel === p ? ' on' : '') + '" data-p="' + p + '"')).join('') +
+      (side === 'back' ? '<path d="M104 52 Q150 0 196 52 Q170 34 150 36 Q130 34 104 52Z" fill="#8B5E3C" opacity=".55" pointer-events="none"/>' : '') + '</svg>';
+  }
+  const FEELS = [
+    ['zuki', '💥', 'ずきずき', 'が ずきずき いたい', 'が ずきずき いたいです'],
+    ['chiku', '📍', 'ちくちく', 'が ちくちく いたい', 'が ちくちく いたいです'],
+    ['hiri', '🔥', 'ひりひり', 'が ひりひり する', 'が ひりひり します'],
+    ['zun', '🪨', 'おもい（ずーん）', 'が おもくて いたい', 'が おもくて いたいです'],
+    ['guru', '🌀', 'きもちわるい', 'が きもちわるい', 'が きもちわるいです'],
+    ['kayu', '🦟', 'かゆい', 'が かゆい', 'が かゆいです'],
+    ['butsu', '💢', 'ぶつけた', 'を ぶつけた', 'を ぶつけました'],
+    ['chi', '🩸', 'ちが でた', 'から ちが でた', 'から ちが でました'],
+    ['hare', '🎈', 'はれて いる', 'が はれて いる', 'が はれて います'],
+    ['atsu', '🥵', 'あつい', 'が あつい', 'が あついです']
+  ];
+  const SCALE = [['😀', 'いたくない', '#40C057'], ['🙂', 'すこし', '#82C91E'], ['😐', 'ちょっと いたい', '#FAB005'], ['😟', 'いたい', '#FD7E14'], ['😣', 'とても いたい', '#F76707'], ['😭', 'がまん できない', '#E03131']];
+  const WHEN = [['⚡', 'いま', 'いま きゅうに'], ['⏱️', 'さっき', 'さっきから'], ['🌅', 'あさから', 'あさから'], ['🌙', 'きのうから', 'きのうから'], ['❓', 'わからない', '']];
+  const CARDS = [['🤢', 'きもちが わるい'], ['🤮', 'はきそう'], ['🥶', 'さむい'], ['🥵', 'あつい'], ['😪', 'ねむい'], ['😩', 'つかれた'], ['🤕', 'けがを した'], ['🩸', 'ちが でた'], ['🤧', 'はなみずが でる'], ['😷', 'せきが でる'], ['🌡️', 'ねつが ある かも'], ['🚻', 'トイレに いきたい'], ['💧', 'みずを のみたい'], ['🛏️', 'よこに なりたい'], ['🏥', 'ほけんしつに いきたい'], ['☎️', 'おうちに れんらく して'], ['💊', 'くすりの じかん'], ['👍', 'もう だいじょうぶ']].map((c, i) => ({ id: 'c' + i, e: c[0], t: c[1] }));
+  // びょういん などの れんしゅう：[え, なにが おこる, どうする, うごき]
+  const REH = [
+    { id: 'byouin', e: '🏥', n: 'びょういん', steps: [
+      ['🏥', 'びょういんに つきました。', 'うけつけで しんさつけんを わたします。'],
+      ['🪑', 'まちあいしつで なまえを よばれるまで まちます。', 'すわって まちます。ほんを よんでも いいです。'],
+      ['🧑‍⚕️', 'なまえを よばれたら しんさつしつに はいります。おいしゃさんが「どう しましたか？」と ききます。', 'いたい ところを つたえます。', 'tell'],
+      ['🩺', 'ちょうしんきで むねの おとを ききます。すこし つめたいです。', 'おおきく いきを すって、はきます。', 'breath'],
+      ['👄', 'くちの なかを みます。', '「あーん」と おおきく くちを あけます。', 'mouth'],
+      ['💊', 'おいしゃさんが くすりを だして くれます。', '「ありがとう ございました」と いいます。'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'haisha', e: '🦷', n: 'はいしゃ', steps: [
+      ['🦷', 'はいしゃさんに つきました。', 'うけつけを して、まちあいしつで まちます。'],
+      ['💺', 'なまえを よばれたら、うごく いすに すわります。いすが うしろに たおれます。', 'からだの ちからを ぬいて ねころびます。'],
+      ['💡', 'まぶしい ライトが つきます。', 'めを とじても いいです。'],
+      ['👄', 'はを みて もらいます。', '「あーん」と くちを あけて まちます。', 'mouth'],
+      ['💦', 'みずが でたり、ウィーンと おとが したり します。', 'うごかないで まちます。いたい ときは ひだりてを あげて しらせます。', 'still'],
+      ['🥤', 'くちを ゆすぎます。', 'コップの みずを くちに いれて、ぺっと だします。'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'kenshin', e: '📏', n: 'けんこう しんだん', steps: [
+      ['📏', 'しんちょうを はかります。', 'せなかを まっすぐに して、うごかないで たちます。', 'still'],
+      ['⚖️', 'たいじゅうを はかります。', 'はかりに のって、じっと します。', 'still'],
+      ['👁️', 'しりょく けんさ。わの あいて いる ほうを こたえます。', 'ゆびで うえ・した・みぎ・ひだりを さします。'],
+      ['🎧', 'ちょうりょく けんさ。ヘッドホンから ピーという おとが します。', 'きこえたら てを あげます。', 'beep'],
+      ['🩺', 'ないか けんしん。おいしゃさんが ちょうしんきで むねの おとを ききます。', 'ふくを すこし あげて、しずかに いきを します。', 'breath'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'chusha', e: '💉', n: 'ちゅうしゃ', steps: [
+      ['💉', 'よぼうせっしゅ（ちゅうしゃ）を します。', 'うでを だして すわります。'],
+      ['🧴', 'アルコールで ふきます。すこし つめたいです。', 'うでを うごかさないで まちます。'],
+      ['📍', 'ちくっと します。', 'ゆっくり 5まで かぞえます。かぞえて いる あいだに おわります。', 'count'],
+      ['🩹', 'ばんそうこうを はります。', '「ありがとう ございました」と いいます。'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] }
+  ];
+  const LIB = [['からだ', [['🤒', 'ねつ'], ['🤕', 'けが'], ['🤢', 'きもちわるい'], ['🤧', 'はなみず'], ['😷', 'マスク'], ['🦷', 'は'], ['👁️', 'め'], ['👂', 'みみ'], ['🦵', 'あし'], ['✋', 'て']]],
+    ['もの', [['💊', 'くすり'], ['🩹', 'ばんそうこう'], ['🧊', 'こおり'], ['🌡️', 'たいおんけい'], ['🧻', 'ティッシュ'], ['🥤', 'のみもの'], ['🛏️', 'ベッド'], ['👓', 'めがね'], ['🎧', 'イヤーマフ'], ['📞', 'でんわ']]]];
+  const APP = {
+    id: 'karada-tsutaeru', title: 'からだ つたえる', ls: 'karada.v1', db: 'mieel-karada', sw: true, color: '#0CA678',
+    defaults: { to: 'せんせい', askFeel: true, askWhen: true },
+    newProfile: (name, icon) => ({ id: 'p' + Math.random().toString(36).slice(2, 9), name, icon, log: [], reh: {} }),
+    normProfile(p) { p.log = Array.isArray(p.log) ? p.log : []; p.reh = p.reh && typeof p.reh === 'object' ? p.reh : {}; },
+    normStore(o) { if (!Array.isArray(o.cards)) o.cards = []; },
+    childScreens: ['part', 'feel', 'scale', 'when', 'tell', 'cards', 'card', 'reh', 'rehs'], topScreens: ['home'],
+    renderHome: () => renderHome(),
+    profileNote: p => 'つたえた きろく ' + p.log.length + 'けん',
+    helpNote: 'からだの ふちょうを ことばで いうのが むずかしい 子が、ゆびさしで「どこが」「どんなふうに」「どのくらい」「いつから」を つたえる ための アプリです。いたさの めもりは かおの えで 0〜5。つたえた ことは きろくに のこるので、ほけんしつや おうちとの れんらくに つかえます（プリントも できます）。びょういん・はいしゃ・けんこうしんだん・ちゅうしゃは、いく まえに なんども れんしゅう して みとおしを もたせます。'
+  };
+const FX = (function () {
+    let cv = null, cx = null, parts = [], raf = 0, last = 0;
+    const COLS = ['#FF6B6B', '#FFA94D', '#FFD43B', '#69DB7C', '#4DABF7', '#9775FA', '#F783AC', '#38D9A9', '#FFFFFF'];
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    const calm = () => document.body.classList.contains('calm') || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    function ensure() {
+      if (cv) return;
+      cv = document.createElement('canvas');
+      cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:44';
+      document.body.appendChild(cv);
+      cx = cv.getContext('2d');
+      const fit = () => { const d = Math.min(window.devicePixelRatio || 1, 2); cv.width = innerWidth * d; cv.height = innerHeight * d; cx.setTransform(d, 0, 0, d, 0, 0); };
+      fit(); window.addEventListener('resize', fit);
+    }
+    function loop(t) {
+      const dt = Math.min(40, t - (last || t)); last = t;
+      cx.clearRect(0, 0, innerWidth, innerHeight);
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        p.age += dt;
+        if (p.age >= p.life || p.y > innerHeight + 60) { if (p.onEnd) p.onEnd(p); parts.splice(i, 1); continue; }
+        p.vy += (p.g || 0) * dt; p.vx *= p.drag || 1; p.vy *= p.drag || 1;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.rot += (p.vr || 0) * dt;
+        const a = p.fade ? Math.max(0, 1 - p.age / p.life) : 1;
+        cx.globalAlpha = a;
+        if (p.k === 'paper') {   // ひらひら まう かみ
+          const w = Math.cos(p.age / 120 + p.ph);
+          cx.save(); cx.translate(p.x + Math.sin(p.age / 300 + p.ph) * 6, p.y); cx.rotate(p.rot); cx.scale(1, w);
+          cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * 0.66); cx.restore();
+        } else if (p.k === 'ribbon') {  // くるくる リボン
+          cx.strokeStyle = p.c; cx.lineWidth = 3; cx.beginPath();
+          for (let j = 0; j < 6; j++) { const yy = p.y - j * 5, xx = p.x + Math.sin(p.age / 90 + j * .9 + p.ph) * 6; j ? cx.lineTo(xx, yy) : cx.moveTo(xx, yy); }
+          cx.stroke();
+        } else if (p.k === 'spark') {   // はなびの ひかり
+          cx.fillStyle = p.c; cx.beginPath(); cx.arc(p.x, p.y, p.s * (1 - p.age / p.life * .6), 0, 7); cx.fill();
+        } else if (p.k === 'rocket') {
+          cx.fillStyle = '#FFF3BF'; cx.beginPath(); cx.arc(p.x, p.y, 4, 0, 7); cx.fill();
+          cx.globalAlpha = .5; cx.fillStyle = '#FFD43B'; cx.beginPath(); cx.arc(p.x, p.y + 10, 3, 0, 7); cx.fill();
+        } else if (p.k === 'emoji') {
+          cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.font = p.s + 'px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+          cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(p.t, 0, 0); cx.restore();
+        } else if (p.k === 'ring') {
+          cx.strokeStyle = p.c; cx.lineWidth = 6 * (1 - p.age / p.life); cx.beginPath(); cx.arc(p.x, p.y, p.s + p.age * 0.35, 0, 7); cx.stroke();
+        }
+      }
+      cx.globalAlpha = 1;
+      raf = parts.length ? requestAnimationFrame(loop) : 0;
+      if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+    }
+    function go() { if (!raf) { last = 0; raf = requestAnimationFrame(loop); } }
+    const P = o => { parts.push(Object.assign({ age: 0, rot: 0, ph: Math.random() * 6 }, o)); };
+    function burst(x, y, n, speed, kinds) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = rnd(speed * .4, speed);
+        const k = kinds[i % kinds.length];
+        if (k === 'paper') P({ k: 'paper', x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .2, g: .0009, drag: .985, vr: rnd(-.01, .01), s: rnd(8, 14), c: COLS[i % COLS.length], life: 2600 });
+        else P({ k: 'spark', x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: .0003, drag: .975, s: rnd(2.5, 4.5), c: COLS[i % 8], life: 900, fade: true });
+      }
+      go();
+    }
+    /* ---- 音 ---- */
+    let ac = null;
+    function A() { try { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; } catch (e) { return null; } }
+    function noise(dur, vol, f0, f1, delay) {
+      const a = A(); if (!a || !FX.sound()) return;
+      const n = Math.floor(a.sampleRate * dur), b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.5);
+      const s = a.createBufferSource(), fl = a.createBiquadFilter(), g = a.createGain(), t = a.currentTime + (delay || 0);
+      s.buffer = b; fl.type = 'bandpass'; fl.Q.value = 0.8; fl.frequency.setValueAtTime(f0, t); if (f1) fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.value = vol * FX.volume(); s.connect(fl); fl.connect(g); g.connect(a.destination); s.start(t);
+    }
+    function popSound(delay) { noise(0.25, 1.4, 2200, 500, delay); }
+    function boomSound(delay) { noise(0.9, 0.9, 700, 90, delay); }
+    function whistle(delay) {
+      const a = A(); if (!a || !FX.sound()) return;
+      const o = a.createOscillator(), g = a.createGain(), t = a.currentTime + delay;
+      o.type = 'sine'; o.frequency.setValueAtTime(600, t); o.frequency.exponentialRampToValueAtTime(1800, t + .6);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.06 * FX.volume(), t + .05); g.gain.exponentialRampToValueAtTime(.0001, t + .65);
+      o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + .7);
+    }
+    function clap(delay, dur) { for (let i = 0; i < dur * 14; i++) noise(0.06, rnd(.3, .7), rnd(900, 2200), 0, delay + i / 14 + rnd(0, .05)); }
+
+    // クラッカー（がめんの したの すみから）
+    function cracker(side, delay) {
+      setTimeout(() => {
+        const x = side < 0 ? 40 : innerWidth - 40, y = innerHeight - 40, dir = side < 0 ? 1 : -1;
+        P({ k: 'emoji', t: '🎉', x: x, y: y, s: 90, rot: side < 0 ? 0 : -1.4, life: 1100, fade: true });
+        for (let i = 0; i < 90; i++) {
+          const a = -Math.PI / 2 + dir * rnd(.15, .85), v = rnd(.7, 1.45);
+          P({ k: i % 5 ? 'paper' : 'ribbon', x: x, y: y - 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: .0011, drag: .986, vr: rnd(-.012, .012), s: rnd(9, 15), c: COLS[i % COLS.length], life: 3600 });
+        }
+        popSound(0); go();
+      }, delay);
+    }
+    function firework(x, y, delay) {
+      setTimeout(() => {
+        P({ k: 'rocket', x: x, y: innerHeight, vx: 0, vy: -(innerHeight - y) / 600, life: 600, onEnd: p => { burst(p.x, p.y, 70, .45, ['spark', 'spark', 'spark', 'paper']); P({ k: 'ring', x: p.x, y: p.y, s: 10, c: '#FFE066', life: 500, fade: true }); boomSound(0); } });
+        whistle(0); go();
+      }, delay);
+    }
+    return {
+      sound: () => true, volume: () => 1,
+      small(el, opt) {
+        if (calm() || !el) return;
+        ensure();
+        const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+        const v = (opt && opt.variant) != null ? opt.variant : Math.floor(Math.random() * 5);
+        if (v === 0) burst(x, y, 40, .6, ['paper']);
+        else if (v === 1) { for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28; P({ k: 'emoji', t: '⭐', x: x, y: y, vx: Math.cos(a) * .35, vy: Math.sin(a) * .35, g: .0004, s: 34, vr: .01, life: 900, fade: true }); } go(); }
+        else if (v === 2) { for (let i = 0; i < 8; i++) P({ k: 'emoji', t: pick2(['💖', '💗', '💕']), x: x + rnd(-40, 40), y: y, vx: rnd(-.08, .08), vy: rnd(-.45, -.25), s: rnd(28, 44), life: 1300, fade: true }); go(); }
+        else if (v === 3) { P({ k: 'ring', x: x, y: y, s: r.width * .3, c: '#FFD43B', life: 600, fade: true }); P({ k: 'ring', x: x, y: y, s: r.width * .2, c: '#69DB7C', life: 700, fade: true }); burst(x, y, 30, .5, ['spark']); }
+        else { for (let i = 0; i < 12; i++) P({ k: 'emoji', t: pick2(['✨', '🌟', '🎵', '🍀']), x: x, y: y, vx: rnd(-.5, .5), vy: rnd(-.7, -.3), g: .0012, s: rnd(26, 40), vr: rnd(-.01, .01), life: 1200, fade: true }); go(); }
+      },
+      big() {
+        if (calm()) return;
+        ensure();
+        cracker(-1, 0); cracker(1, 180);
+        const W = innerWidth, H = innerHeight;
+        firework(W * .25, H * .25, 700); firework(W * .72, H * .2, 1100); firework(W * .5, H * .32, 1500); firework(W * .35, H * .18, 1900);
+        setTimeout(() => { for (let i = 0; i < 120; i++) P({ k: i % 6 ? 'paper' : 'ribbon', x: rnd(0, W), y: rnd(-H * .6, -10), vx: rnd(-.05, .05), vy: rnd(.08, .22), g: .00004, vr: rnd(-.01, .01), s: rnd(9, 15), c: COLS[i % COLS.length], life: 6000 }); go(); }, 1200);
+        clap(0.4, 2.2);
+      }
+    };
+    function pick2(a) { return a[Math.floor(Math.random() * a.length)]; }
+  })();
+  /* ============================================================
+     MieeL アプリ きょうつう（base.js）
+     APP = { id, title, ls, db, defaults, newProfile(name, icon), normProfile(p), childScreens, topScreens,
+             renderHome(), renderSettings(add, st, vp, refresh), onCloseSettings(screen) }
+     ============================================================ */
+  const $ = s => document.querySelector(s);
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  function load(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  const BASE_DEFAULTS = { voice: true, sound: true, volume: 0.8, rate: 0.95, calm: false };
+  const ICONS = ['🐰', '🐻', '🐼', '🐱', '🐶', '🦊', '🐸', '🐧', '🐯', '🐨', '🐵', '🦁', '🐹', '🐮', '🐷', '🐤'];
+  function normalize(s) {
+    s = s && typeof s === 'object' ? s : {};
+    const o = Object.assign({}, s, { profiles: Array.isArray(s.profiles) && s.profiles.length ? s.profiles : [APP.newProfile('みんな', '🐰')], currentId: s.currentId || null, settings: Object.assign({}, BASE_DEFAULTS, APP.defaults || {}, s.settings || {}) });
+    o.profiles.forEach(p => { p.id = p.id || 'p' + uid(); p.name = p.name || 'なまえ'; p.icon = p.icon || '🐰'; if (APP.normProfile) APP.normProfile(p); });
+    if (!o.profiles.some(p => p.id === o.currentId)) o.currentId = o.profiles[0].id;
+    if (APP.normStore) APP.normStore(o);
+    return o;
+  }
+  let store = normalize(load(APP.ls));
+  const S = () => store.settings;
+  let saveT = 0;
+  function persist() { clearTimeout(saveT); if (!save(APP.ls, store)) toast('保存できませんでした（容量を確認してください）'); }
+  function persistSoon() { clearTimeout(saveT); saveT = setTimeout(persist, 350); }
+  const cur = () => store.profiles.find(p => p.id === store.currentId) || store.profiles[0];
+
+  function h(tag, props) {
+    const el = document.createElement(tag);
+    if (props) Object.keys(props).forEach(k => {
+      const v = props[k];
+      if (v === null || v === undefined || v === false) return;
+      if (k === 'class') el.className = v;
+      else if (k === 'html') el.innerHTML = v;
+      else if (k === 'value') el.value = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    });
+    (function add(list) { list.forEach(c => { if (c === null || c === undefined || c === false) return; if (Array.isArray(c)) add(c); else el.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c); }); })(Array.prototype.slice.call(arguments, 2));
+    return el;
+  }
+  const E = (e, cls) => h('span', { class: 'emo' + (cls ? ' ' + cls : '') }, e);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let toastTimer = 0;
+  function toast(m, ms) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms || 2600); }
+  let lockUntil = 0;
+  function tapOk(ms) { const n = Date.now(); if (n < lockUntil) return false; lockUntil = n + (ms || 350); return true; }
+  let gen = 0; const timers = new Set(); let stops = [];
+  function after(ms, fn) { const g = gen; const id = setTimeout(() => { timers.delete(id); if (g === gen) fn(); }, ms); timers.add(id); return id; }
+  function every(ms, fn) { const g = gen; const id = setInterval(() => { if (g !== gen) { clearInterval(id); return; } fn(); }, ms); return id; }
+  const wait = ms => new Promise(r => after(ms, r));
+  function onStop(fn) { stops.push(fn); }
+  function stopAll() { gen++; timers.forEach(clearTimeout); timers.clear(); const s = stops; stops = []; s.forEach(f => { try { f(); } catch (e) { /* 無視 */ } }); stopSpeak(); document.querySelectorAll('.ov').forEach(x => x.remove()); }
+  function longPress(el, ms, fn) {
+    let t = 0;
+    el.addEventListener('pointerdown', e => { e.preventDefault(); el.classList.add('pressing'); t = setTimeout(() => { el.classList.remove('pressing'); fn(); }, ms); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => el.addEventListener(ev, () => { clearTimeout(t); el.classList.remove('pressing'); }));
+    el.addEventListener('contextmenu', e => e.preventDefault());
+  }
+  function quitBtn(fn, label) { const b = h('button', { type: 'button', class: 'quit', 'aria-label': 'とちゅうで おわる（ながおし）' }, h('i'), h('span', null, label || '✕ おわる（ながおし）')); longPress(b, 1500, fn); return b; }
+
+  /* ---- 音・よみあげ ---- */
+  let ac = null;
+  function actx() { try { if (!ac) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ac = new AC(); } if (ac.state === 'suspended') ac.resume(); return ac; } catch (e) { return null; } }
+  function audio() { return S().sound ? actx() : null; }
+  function tone(f, st, dur, type, vol, f2) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime + st, o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime((vol || .2) * S().volume, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + dur + .05);
+  }
+  const sfx = {
+    tap() { tone(700, 0, .07, 'triangle', .13); },
+    ok() { tone(880, 0, .12, 'triangle', .24); tone(1319, .09, .28, 'triangle', .2); },
+    ng() { tone(330, 0, .16, 'sine', .14); tone(294, .12, .2, 'sine', .12); },
+    step(i) { tone([659, 784, 880, 988, 1047, 1175][(i || 0) % 6], 0, .16, 'triangle', .2); },
+    page() { tone(523, 0, .1, 'sine', .12, 784); },
+    bell() { tone(1046, 0, 1.4, 'sine', .2); tone(1568, .02, 1.1, 'sine', .07); },
+    clear() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .09, .28, 'triangle', .24)); }
+  };
+  const EMBED = /[?&]embed=1/.test(location.search);
+  const TEST = /[?&]test=1/.test(location.search);
+  const canSpeak = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  let jaVoice = null;
+  function loadVoice() { if (!canSpeak) return; const v = (speechSynthesis.getVoices() || []).filter(x => /^ja(-|_|$)/i.test(x.lang)); jaVoice = v.find(x => /Kyoko|O-ren|Otoya|Hattori|Nanami/i.test(x.name)) || v.find(x => x.localService) || v[0] || null; }
+  function speak(text, opt) {
+    opt = opt || {};
+    if (!canSpeak || !S().voice || !text || EMBED) { if (opt.end) setTimeout(opt.end, 30); return null; }
+    try {
+      if (!opt.keep) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(jaSay(text)); u.lang = 'ja-JP'; u.rate = (Number(S().rate) || .95) * (opt.rate || 1); u.pitch = opt.pitch || 1.05; if (jaVoice) u.voice = jaVoice;
+      if (opt.end) u.onend = opt.end;
+      speechSynthesis.speak(u); return u;
+    } catch (e) { if (opt.end) setTimeout(opt.end, 30); return null; }
+  }
+  function stopSpeak() { if (canSpeak) { try { speechSynthesis.cancel(); } catch (e) { /* 無視 */ } } }
+  function praise(t) {
+    if (document.body.classList.contains('calm')) return;
+    const p = h('div', { class: 'praise' }, t || pick(['すごい！', 'できたね！', 'じょうず！', 'ばっちり！', 'いいね！', 'さすが！']));
+    p.style.color = pick(['#F76707', '#E64980', '#1C7ED6', '#2F9E44', '#7048E8', '#F59F00']);
+    document.body.appendChild(p); setTimeout(() => p.remove(), 1300);
+  }
+  let wake = null;
+  async function keepAwake() { try { if ('wakeLock' in navigator && !wake) { wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', () => { wake = null; }); } } catch (e) { /* 無視 */ } }
+  FX.sound = () => S().sound; FX.volume = () => Number(S().volume) || 0.8;
+
+  /* ---- しゃしん・ろくおん（この たんまつの IndexedDB だけ。おくらない） ---- */
+  const DB = {
+    db: null,
+    open() { if (this.db) return Promise.resolve(this.db); return new Promise((res, rej) => { const r = indexedDB.open(APP.db || ('mieel-' + APP.id), 1); r.onupgradeneeded = () => r.result.createObjectStore('media', { keyPath: 'id' }); r.onsuccess = () => { this.db = r.result; res(this.db); }; r.onerror = () => rej(r.error); }); },
+    async get(id) { const d = await this.open(); return new Promise((res, rej) => { const q = d.transaction('media').objectStore('media').get(id); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+    async all() { const d = await this.open(); return new Promise((res, rej) => { const q = d.transaction('media').objectStore('media').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error); }); },
+    async put(v) { const d = await this.open(); return new Promise((res, rej) => { const tx = d.transaction('media', 'readwrite'); tx.objectStore('media').put(v); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); },
+    async del(id) { const d = await this.open(); return new Promise((res, rej) => { const tx = d.transaction('media', 'readwrite'); tx.objectStore('media').delete(id); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); },
+    async clear() { const d = await this.open(); return new Promise((res, rej) => { const tx = d.transaction('media', 'readwrite'); tx.objectStore('media').clear(); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+  };
+  const URLS = {};
+  async function mediaURL(id) { if (!id) return null; if (URLS[id]) return URLS[id]; try { const m = await DB.get(id); if (!m) return null; URLS[id] = URL.createObjectURL(m.blob); return URLS[id]; } catch (e) { return null; } }
+  function pickFile(accept, capture, multiple) {
+    return new Promise(res => {
+      const fi = $('#fileIn'); fi.value = ''; fi.accept = accept; fi.multiple = !!multiple;
+      if (capture) fi.setAttribute('capture', capture); else fi.removeAttribute('capture');
+      fi.onchange = () => res(fi.files && fi.files.length ? Array.from(fi.files) : null);
+      fi.click();
+    });
+  }
+  async function savePhoto(file, max) {
+    const url = URL.createObjectURL(file), im = new Image(); im.src = url;
+    await new Promise(r => { im.onload = r; im.onerror = r; });
+    const k = Math.min(1, (max || 900) / Math.max(im.width || 1, im.height || 1)), c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round((im.width || 1) * k)); c.height = Math.max(1, Math.round((im.height || 1) * k));
+    c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+    const blob = await new Promise(r => c.toBlob(b => r(b), 'image/jpeg', 0.82));
+    const id = 'm' + uid(); await DB.put({ id, blob, kind: 'img', at: Date.now() }); return id;
+  }
+  const blobToData = b => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.onerror = () => r(null); fr.readAsDataURL(b); });
+  async function mediaData(id) { if (!id) return null; try { const m = await DB.get(id); return m ? await blobToData(m.blob) : null; } catch (e) { return null; } }
+  // せんせいの こえ・こどもの こえを ろくおん（もういちど おすと とまる・さいだい 20びょう）
+  let recorder = null;
+  async function recordToggle(btn, done, maxSec) {
+    if (recorder) { try { recorder.stop(); } catch (e) { /* 無視 */ } return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = ['audio/mp4', 'audio/webm', ''].find(m => !m || (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)));
+      const r = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); recorder = r;
+      const chunks = [];
+      r.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      r.onstop = async () => { stream.getTracks().forEach(t => t.stop()); if (btn) btn.classList.remove('on'); recorder = null; const blob = new Blob(chunks, { type: r.mimeType || 'audio/mp4' }); if (blob.size > 300) { const id = 'a' + uid(); await DB.put({ id, blob, kind: 'audio', at: Date.now() }); done(id); } };
+      r.start(); if (btn) btn.classList.add('on'); toast('🔴 ろくおん ちゅう… もう いちど おすと とまります', 3000);
+      setTimeout(() => { if (recorder === r) r.stop(); }, (maxSec || 20) * 1000);
+    } catch (e) { recorder = null; toast('マイクが つかえません（マイクを 許可して ください）', 3500); }
+  }
+  let playing = null;
+  async function playMedia(id, end) { const u = await mediaURL(id); if (!u) { if (end) end(); return false; } stopSpeak(); if (playing) playing.pause(); playing = new Audio(u); playing.onended = () => { playing = null; if (end) end(); }; try { await playing.play(); } catch (e) { if (end) end(); } return true; }
+  function pic(it, cls) {
+    const w = h('div', { class: 'pic' + (cls ? ' ' + cls : '') }, E(it && it.emoji || '📷'));
+    if (it && it.media) mediaURL(it.media).then(u => { if (u) { w.innerHTML = ''; w.append(h('img', { src: u, alt: '' })); } });
+    return w;
+  }
+  async function picHTML(it) { const d = it && it.media ? await mediaData(it.media) : null; return d ? '<img src="' + d + '" alt="">' : '<span class="pe">' + esc(it && it.emoji || '') + '</span>'; }
+
+  /* ---- がめん・ヘッダー ---- */
+  let screen = 'home';
+  function setView(cls, children) { stopAll(); const v = $('#view'); v.innerHTML = ''; v.appendChild(h('section', { class: 'screen ' + cls }, children)); chips(); }
+  function chips() {
+    const p = cur(), c = $('#whoChip'), hb = $('#homeBtn'), child = (APP.childScreens || []).indexOf(screen) >= 0;
+    if ($('#printBtn')) $('#printBtn').hidden = (APP.topScreens || ['home']).indexOf(screen) < 0;
+    hb.hidden = screen === 'home' || screen === 'who';
+    $('#homeLbl').textContent = child ? 'ながおし' : 'さいしょ';
+    c.hidden = store.profiles.length < 2 || child || screen === 'who';
+    c.innerHTML = ''; c.append(E(p.icon), p.name);
+    if (APP.chips) APP.chips(screen);
+  }
+  function renderWho() {
+    screen = 'who';
+    setView('who home', [h('h1', { class: 'title' }, 'だれが つかう？'), h('div', { class: 'menu' }, store.profiles.map(p => h('button', { type: 'button', class: 'mcard', style: '--c:' + (APP.color || '#1C7ED6'), onclick: () => { if (!tapOk()) return; sfx.tap(); speak(p.name); store.currentId = p.id; persist(); APP.renderHome(); } }, E(p.icon), h('b', null, p.name))))]);
+  }
+  (function () {
+    const b = $('#homeBtn'); let t = 0;
+    b.addEventListener('pointerdown', e => { e.preventDefault(); if ((APP.childScreens || []).indexOf(screen) < 0) return; b.classList.add('pressing'); t = setTimeout(() => { b.classList.remove('pressing'); APP.renderHome(); }, 1200); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => { clearTimeout(t); b.classList.remove('pressing'); }));
+    b.addEventListener('click', () => { if ((APP.childScreens || []).indexOf(screen) < 0 && tapOk()) { sfx.tap(); if (APP.beforeHome && APP.beforeHome() === false) return; APP.renderHome(); } });
+    $('#whoChip').addEventListener('click', () => { if ((APP.childScreens || []).indexOf(screen) < 0) renderWho(); });
+  })();
+
+  /* ---- 先生用せってい ---- */
+  function seg(value, opts, onPick) { return h('div', { class: 'seg' }, opts.map(o => h('button', { type: 'button', class: String(o[0]) === String(value) ? 'on' : '', onclick: () => onPick(o[0]) }, o[1]))); }
+  const srow = (label, ctl, note) => h('div', { class: 'srow' }, h('div', null, label, note ? h('div', { class: 'note' }, note) : null), ctl);
+  const chk = (label, k, note) => h('label', { class: 'row' }, h('span', null, label, note ? h('div', { class: 'note' }, note) : null), h('input', { type: 'checkbox', checked: !!S()[k], onchange: e => { S()[k] = e.target.checked; persist(); } }));
+  let viewPid = null;
+  function openSettings() { stopSpeak(); renderSettings(); $('#settings').classList.add('open'); $('#settings').scrollTop = 0; }
+  function closeSettings() { persist(); $('#settings').classList.remove('open'); document.body.classList.toggle('calm', !!S().calm); if (APP.onCloseSettings) APP.onCloseSettings(screen); else if (screen === 'home') APP.renderHome(); chips(); }
+  function refreshSettings() { const m = $('#settings'), y = m.scrollTop; renderSettings(); m.scrollTop = y; }
+  const setS = (k, v) => { S()[k] = v; persist(); refreshSettings(); };
+  function renderSettings() {
+    const P = $('#settingsPanel'); P.innerHTML = '';
+    const add = (...a) => P.append(...a.filter(Boolean));
+    const st = S();
+    if (!store.profiles.some(p => p.id === viewPid)) viewPid = store.currentId;
+    const vp = store.profiles.find(p => p.id === viewPid);
+    add(h('div', { class: 'panel-head' }, h('h2', null, '⚙️ 先生用せってい'), h('button', { type: 'button', class: 'btn ok', onclick: closeSettings }, '✓ とじる')),
+      h('p', { class: 'note' }, 'この画面は 右上の ⚙️ を 1.5秒 ながおし すると ひらきます。変更は すぐに保存されます（この端末のみ）。'));
+    add(h('h3', null, '👦 つかう 子ども'));
+    store.profiles.forEach((p, i) => add(h('div', { class: 'prow' },
+      h('button', { type: 'button', class: 'mini-btn', onclick: () => { p.icon = ICONS[(ICONS.indexOf(p.icon) + 1) % ICONS.length]; persist(); refreshSettings(); } }, E(p.icon)),
+      h('input', { type: 'text', value: p.name, style: 'flex:1;min-width:140px', oninput: e => { p.name = e.target.value; persistSoon(); } }),
+      APP.profileNote ? h('span', { class: 'note' }, APP.profileNote(p)) : null,
+      store.profiles.length > 1 ? h('button', { type: 'button', class: 'mini-btn warn', onclick: () => { if (confirm(p.name + ' を けしますか？（きろくも きえます）')) { store.profiles.splice(i, 1); if (store.currentId === p.id) store.currentId = store.profiles[0].id; persist(); refreshSettings(); } } }, 'けす') : null)));
+    add(h('div', { class: 'btns' }, h('button', { type: 'button', class: 'btn primary', onclick: () => { const np = APP.newProfile('なまえ' + (store.profiles.length + 1), ICONS[store.profiles.length % ICONS.length]); if (APP.normProfile) APP.normProfile(np); store.profiles.push(np); viewPid = np.id; persist(); refreshSettings(); } }, '＋ 子どもを ふやす')),
+      h('p', { class: 'note' }, '2人いじょう いると、はじめに「だれが つかう？」が でます。'));
+    const pidSel = () => store.profiles.length > 1 ? srow('子ども', h('select', { onchange: e => { viewPid = e.target.value; refreshSettings(); } }, store.profiles.map(p => h('option', { value: p.id, selected: p.id === viewPid }, p.name)))) : null;
+    APP.renderSettings(add, st, vp, pidSel);
+    add(h('h3', null, '🔊 おと・ひょうじ'), chk('よみあげ', 'voice'), chk('こうかおん', 'sound'),
+      srow('おおきさ', h('input', { type: 'range', min: '0.2', max: '1', step: '0.1', value: st.volume, onchange: e => { st.volume = Number(e.target.value); persist(); } })),
+      srow('よみあげの はやさ', seg(st.rate, [[0.8, 'ゆっくり'], [0.95, 'ふつう'], [1.1, 'はやめ']], v => setS('rate', Number(v)))),
+      chk('うごきを ひかえめに（はなび なし）', 'calm'));
+    if (window.MieelPrintAPI && $('#printBtn')) add(h('h3', null, '🖨️ プリント（A4）'),
+      h('div', { class: 'btns' }, h('button', { type: 'button', class: 'btn primary', onclick: () => { closeSettings(); PrintUI.open(); } }, '🖨️ プリントの 画面を ひらく')),
+      h('p', { class: 'note' }, '上の 🖨️ プリント ボタンからも ひらけます。みほんと おなじ ものが いんさつ されます。'));
+    if (APP.db !== false) add(h('h3', null, '🔒 データ（この たんまつの なかだけ）'),
+      h('p', { class: 'note' }, 'しゃしん・ろくおん・きろくは この たんまつ（ブラウザ）の なかだけに ほぞん され、インターネットには おくりません。ほかの たんまつへの いどうや バックアップは「ファイルに かきだす」で。'),
+      h('div', { class: 'btns' }, h('button', { type: 'button', class: 'btn primary', onclick: exportData }, '⬇ ファイルに かきだす'), h('button', { type: 'button', class: 'btn', onclick: importData }, '⬆ ファイルから よみこむ')));
+    if (APP.helpNote) add(h('h3', null, '💡 このアプリの かんがえかた'), h('p', { class: 'note' }, APP.helpNote));
+    add(h('div', { class: 'btns', style: 'margin-top:20px' }, h('button', { type: 'button', class: 'btn ok', onclick: closeSettings }, '✓ とじる')));
+    add(h('div', { class: 'mieel-foot' }, h('div', { class: 'mieel-brand' }, h('span', { class: 'orb-mini' }), h('strong', null, 'MieeL')),
+      h('a', { href: 'https://www.mieel-support-school.com/', target: '_blank', rel: 'noopener' }, 'www.mieel-support-school.com'),
+      h('div', null, '© ' + APP.title + '（特別支援教育向け）・学校や家庭での利用は自由です（無断転載・再配布・販売はお断り）')));
+  }
+  async function exportData() {
+    const media = [];
+    try { for (const m of await DB.all()) media.push({ id: m.id, kind: m.kind, at: m.at, data: await blobToData(m.blob) }); } catch (e) { /* 無視 */ }
+    const blob = new Blob([JSON.stringify({ app: APP.id, v: 1, store, media })], { type: 'application/json' });
+    const d = new Date(), name = APP.title.replace(/\s/g, '') + '_' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '.json';
+    const a = h('a', { href: URL.createObjectURL(blob), download: name }); document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    toast('ファイルに かきだしました');
+  }
+  async function importData() {
+    const fs = await pickFile('application/json,.json'); if (!fs) return;
+    try {
+      const j = JSON.parse(await fs[0].text());
+      if (j.app !== APP.id) throw new Error('x');
+      if (!confirm('いまの データを、この ファイルの なかみに おきかえますか？')) return;
+      await DB.clear();
+      for (const m of j.media || []) { const r = await fetch(m.data); await DB.put({ id: m.id, kind: m.kind, at: m.at || Date.now(), blob: await r.blob() }); }
+      store = normalize(j.store); persist(); Object.keys(URLS).forEach(k => delete URLS[k]);
+      toast('よみこみました'); refreshSettings(); APP.renderHome();
+    } catch (e) { toast('この ファイルは よみこめません'); }
+  }
+  (function () {
+    const g = $('#gear'); let t = 0;
+    g.addEventListener('pointerdown', e => { e.preventDefault(); g.classList.add('pressing'); t = setTimeout(() => { g.classList.remove('pressing'); openSettings(); }, 1500); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => g.addEventListener(ev, () => { clearTimeout(t); g.classList.remove('pressing'); }));
+    g.addEventListener('contextmenu', e => e.preventDefault());
+    $('#settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeak(); });
+  })();
+  function startApp() {
+    document.body.classList.toggle('calm', !!S().calm);
+    if (canSpeak) { loadVoice(); if ('onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = loadVoice; }
+    if (APP.sw && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !EMBED) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (store.profiles.length > 1 && !EMBED) renderWho(); else APP.renderHome();
+  }
+
+  /* ============================================================
+     🖨️ プリントの 画面（ほかの MieeL アプリと おなじ かたち：ひだりに せってい、みぎに A4 の みほん）
+     みほんと おなじ ものが いんさつ されます。
+     ============================================================ */
+  const PrintUI = (function () {
+    const MM = 96 / 25.4;
+    let st = null, pages = [], custom = null;
+    function types() { return window.MieelPrintAPI.list({ all: true }); }
+    function ensure() {
+      const list = types();
+      if (!st || !list.some(t => t.id === st.type)) st = { type: list[0].id, v: {} };
+      const t = list.find(x => x.id === st.type);
+      t.params.forEach(p => { if (st.v[p.key] === undefined || !p.opts.some(o => String(o[0]) === String(st.v[p.key]))) st.v[p.key] = p.def; });
+      return t;
+    }
+    function build() { ensure(); return window.MieelPrintAPI.build(st.type, Object.assign({}, st.v)).then(r => { pages = r.pages; }); }
+    // きまった ページ（つくった はっぴょう など）を みほんつきで いんさつ
+    function openPages(title, arr) { stopSpeak(); custom = { title, pages: arr }; pages = arr; $('#printModal').classList.add('open'); $('#printModal').scrollTop = 0; render(); }
+    function open(type, preset) {
+      stopSpeak(); custom = null;
+      if (type) { ensure(); st.type = type; }
+      if (preset) Object.assign(st.v, preset);
+      $('#printModal').classList.add('open'); $('#printModal').scrollTop = 0;
+      build().then(render);
+    }
+    function close() { $('#printModal').classList.remove('open'); }
+    function render() {
+      const t = custom ? null : ensure();
+      const P = $('#printPanel'); P.innerHTML = '';
+      const re = () => build().then(render);
+      const seg = (label, cur, opts, on, cls) => [h('div', { class: 'seglabel' }, label), h('div', { class: 'seg' + (cls ? ' ' + cls : '') }, opts.map(o => h('button', { type: 'button', class: String(cur) === String(o[0]) ? 'on' : '', onclick: () => on(o[0]) }, o[1])))];
+      const prev = h('div', { class: 'prprev' });
+      P.append(
+        h('div', { class: 'panel-head' }, h('h2', null, '🖨️ A4 プリント'), h('button', { type: 'button', class: 'btn ok', onclick: close }, 'とじる')),
+        h('div', { class: 'prgrid' },
+          custom ? h('div', { class: 'prctl' }, h('div', { class: 'seglabel' }, custom.title),
+            h('div', { class: 'btns', style: 'margin-top:16px' }, h('button', { type: 'button', class: 'btn blue', onclick: doIt }, '🖨️ いんさつ する')),
+            h('p', { class: 'note' }, 'いんさつの せってい：よう紙 A4・たて、よはく「なし」（または さいしょう）、「背景の グラフィック」オンが おすすめです。'))
+          : h('div', { class: 'prctl' },
+            seg('プリントの しゅるい', st.type, types().map(x => [x.id, (x.icon ? x.icon + ' ' : '') + x.name]), v => { st.type = v; re(); }, 'types'),
+            t.params.map(p => p.opts.length > 6
+              ? [h('div', { class: 'seglabel' }, p.label), h('select', { style: 'width:100%', onchange: e => { const o = p.opts.find(x => String(x[0]) === e.target.value); st.v[p.key] = o ? o[0] : e.target.value; re(); } }, p.opts.map(o => h('option', { value: String(o[0]), selected: String(o[0]) === String(st.v[p.key]) }, o[1])))]
+              : seg(p.label, st.v[p.key], p.opts, v => { st.v[p.key] = v; re(); })),
+            h('div', { class: 'btns', style: 'margin-top:16px' },
+              window.MieelPrintAPI.fixed ? null : h('button', { type: 'button', class: 'btn', onclick: re }, '🔄 べつの もんだい'),
+              h('button', { type: 'button', class: 'btn blue', onclick: doIt }, '🖨️ いんさつ する')),
+            h('p', { class: 'note' }, 'いんさつの せってい：よう紙 A4・たて、よはく「なし」（または さいしょう）、「背景の グラフィック」オンが おすすめです。'),
+            h('p', { class: 'note' }, pages.length + 'まい（みほんと おなじ ものが いんさつ されます）')),
+          prev));
+      const W = Math.max(240, (prev.clientWidth || 600) - 24), sc = Math.min(1, W / (210 * MM));
+      pages.forEach(pg => {
+        const w = h('div', { class: 'pwrap', style: 'width:' + (210 * MM * sc) + 'px;height:' + (297 * MM * sc) + 'px', html: pg });
+        w.firstChild.style.transform = 'scale(' + sc + ')';
+        prev.appendChild(w);
+      });
+    }
+    function doIt() { const root = $('#printRoot'); root.innerHTML = pages.join(''); setTimeout(() => window.print(), 60); }
+    window.addEventListener('afterprint', () => { $('#printRoot').innerHTML = ''; });
+    $('#printModal').addEventListener('click', e => { if (e.target.id === 'printModal') close(); });
+    $('#printBtn').addEventListener('click', () => { if (tapOk(500)) open(); });
+    return { open, openPages, close };
+  })();
+
+
+  const cardsAll = () => CARDS.concat(store.cards);
+  async function cleanMedia() { const used = new Set(store.cards.map(c => c.media).filter(Boolean)); try { for (const m of await DB.all()) if (!used.has(m.id) && Date.now() - m.at > 60000) await DB.del(m.id); } catch (e) { /* 無視 */ } }
+
+  /* ============================================================
+     ホーム
+     ============================================================ */
+  function renderHome() {
+    screen = 'home'; T = null;
+    const mk = (c, e, b, s, fn) => h('button', { type: 'button', class: 'mcard', style: '--c:' + c, onclick: () => { if (tapOk()) { sfx.tap(); fn(); } } }, E(e), h('b', null, b), h('small', null, s));
+    setView('home', [
+      h('h1', { class: 'title' }, '🩺 からだ つたえる', h('small', null, 'いたい ところや からだの ようすを つたえよう')),
+      h('div', { class: 'menu' },
+        mk('#E03131', '🩹', 'どこが いたい？', 'からだの えで つたえる', () => startTell()),
+        mk('#0CA678', '🏥', 'からだの カード', 'さむい・はきそう・やすみたい', renderCards),
+        mk('#1C7ED6', '🎒', 'びょういん れんしゅう', 'はいしゃ・けんしん・ちゅうしゃ も', renderRehList)),
+      h('div', { class: 'note-box' }, '🔒 きろく・しゃしんは この たんまつの なかだけに ほぞん します。インターネットには おくりません。')
+    ]);
+  }
+
+  /* ============================================================
+     どこが いたい？
+     ============================================================ */
+  let T = null;
+  const stepsOf = () => ['part'].concat(S().askFeel ? ['feel'] : [], ['scale'], S().askWhen ? ['when'] : [], ['tell']);
+  function startTell(ret) { T = { part: null, feel: null, scale: null, when: null, ret: ret || null }; keepAwake(); goStep('part'); }
+  function goStep(s) { ({ part: renderPart, feel: renderFeel, scale: renderScale, when: renderWhen, tell: renderTell })[s](); }
+  function nextStep() { const L = stepsOf(); goStep(L[L.indexOf(screen) + 1]); }
+  function prevStep() { const L = stepsOf(), i = L.indexOf(screen); if (i <= 0) { if (T.ret) T.ret(); else renderHome(); } else goStep(L[i - 1]); }
+  function shead(ask) {
+    const L = stepsOf();
+    return [h('div', { class: 'sdots' }, L.map((s, i) => h('i', { class: i <= L.indexOf(screen) ? 'on' : '' }))),
+      h('div', { class: 'shead' }, h('button', { type: 'button', class: 'mid-btn back', onclick: () => { if (tapOk()) prevStep(); } }, '◀ もどる'), h('div', { class: 'ask' }, ask), h('span', { style: 'width:90px' }))];
+  }
+  function renderPart() {
+    screen = 'part';
+    const bodies = h('div', { class: 'bodies' }, ['front', 'back'].map(sd => h('div', { class: 'bd' }, h('b', null, sd === 'front' ? 'まえ' : 'うしろ'), h('div', { style: 'flex:1;min-height:0;width:100%;display:flex', html: bodySVG(sd, T.part) }))));
+    const choose = p => { if (!tapOk(300)) return; T.part = p; sfx.tap(); speak(PARTS[p]); renderPart(); after(900, nextStep); };
+    bodies.addEventListener('click', e => { const t = e.target.closest('[data-p]'); if (t) choose(t.getAttribute('data-p')); });
+    setView('step', [shead('どこが いたい？'), h('div', { class: 'mapwrap' }, bodies,
+      h('div', { class: 'plist' }, Object.keys(PARTS).map(p => h('button', { type: 'button', class: T.part === p ? 'on' : '', onclick: () => choose(p) }, PARTS[p]))))]);
+    if (!T.part) speak('どこが いたい？ からだの えを さわってね');
+  }
+  function optsScreen(name, ask, list, onPick, cls) {
+    screen = name;
+    setView('step', [shead(ask), h('div', { class: cls || 'opts' }, list)]);
+    speak(ask);
+  }
+  function renderFeel() {
+    optsScreen('feel', PARTS[T.part] + 'は どんな かんじ？', FEELS.map(f => h('button', { type: 'button', onclick: () => { if (!tapOk(400)) return; T.feel = f[0]; sfx.tap(); speak(f[2]); after(700, nextStep); } }, E(f[1]), f[2])));
+  }
+  function renderScale() {
+    screen = 'scale';
+    setView('step', [shead('どのくらい？'),
+      h('div', { class: 'scale' }, SCALE.map((s, i) => h('button', { type: 'button', style: '--sc:' + s[2], onclick: () => { if (!tapOk(400)) return; T.scale = i; sfx.tap(); speak(i + '、' + s[1]); after(800, nextStep); } }, E(s[0]), h('b', null, String(i)), s[1]))),
+      h('div', { class: 'scalebar' })]);
+    speak('どのくらい いたい？ かおを えらんでね');
+  }
+  function renderWhen() {
+    optsScreen('when', 'いつから？', WHEN.map((w, i) => h('button', { type: 'button', onclick: () => { if (!tapOk(400)) return; T.when = i; sfx.tap(); speak(w[1]); after(700, nextStep); } }, E(w[0]), w[1])));
+  }
+  function sentence(polite) {
+    const f = FEELS.find(x => x[0] === T.feel), p = PARTS[T.part] || 'からだ';
+    const body = f ? p + (polite ? f[4] : f[3]) : p + (polite ? 'が いたいです' : 'が いたい');
+    return body;
+  }
+  function renderTell() {
+    screen = 'tell';
+    const sc = T.scale == null ? null : SCALE[T.scale], w = T.when == null ? null : WHEN[T.when];
+    const say = () => {
+      const to = S().to ? S().to + '、' : '';
+      speak(to + sentence(true) + '。' + (sc ? 'いたさは ' + T.scale + '、' + sc[1] + '。' : '') + (w && w[2] ? w[2] + ' です。' : ''));
+    };
+    setView('step', [shead('これを みせて つたえよう'),
+      h('div', { class: 'tell' }, h('div', { class: 'tcard', style: sc ? 'border-color:' + sc[2] : '' },
+        h('div', { html: bodySVG(['back', 'waist', 'butt', 'neck'].indexOf(T.part) >= 0 ? 'back' : 'front', T.part) }),
+        h('div', null, h('div', { class: 'msg' }, S().to ? [S().to + '、', h('br')] : null, sentence(false) + '。'),
+          h('div', { class: 'meta' }, sc ? h('span', null, sc[0] + ' ' + T.scale + '：' + sc[1]) : null, w && T.when < 4 ? h('span', null, w[0] + ' ' + w[1]) : null)))),
+      h('div', { class: 'actions' },
+        h('button', { type: 'button', class: 'big-btn blue', onclick: () => { if (tapOk()) say(); } }, '🔊 こえで つたえる'),
+        h('button', { type: 'button', class: 'big-btn go', onclick: () => { if (!tapOk()) return; logTell(); sfx.ok(); praise('つたえられたね！'); after(1200, () => { if (T.ret) T.ret(true); else renderHome(); }); } }, '✓ つたえた'))]);
+    say();
+  }
+  function logTell() {
+    const p = cur();
+    p.log.push({ t: Date.now(), part: T.part, feel: T.feel, scale: T.scale, when: T.when });
+    if (p.log.length > 1000) p.log.splice(0, p.log.length - 1000);
+    persist();
+  }
+
+  /* ============================================================
+     からだの カード
+     ============================================================ */
+  function renderCards() {
+    screen = 'cards';
+    setView('step', [h('div', { class: 'shead' }, h('div', { class: 'ask' }, 'からだの ようすを つたえよう')),
+      h('div', { class: 'cards' }, cardsAll().map(c => h('button', { type: 'button', onclick: () => { if (tapOk()) showCard(c); } }, pic(c.media ? c : { emoji: c.e }), c.t))),
+      h('div', { class: 'actions' }, h('button', { type: 'button', class: 'big-btn white', onclick: () => { if (tapOk()) startTell(renderCards); } }, '🩹 いたい ところを つたえる'))]);
+  }
+  function showCard(c) {
+    screen = 'card'; sfx.tap();
+    const to = S().to ? S().to + '、' : '';
+    const say = () => speak(to + c.t + '。');
+    setView('step', [h('div', { class: 'bigcard' }, pic(c.media ? c : { emoji: c.e }), h('div', { class: 't' }, c.t)),
+      h('div', { class: 'actions' }, h('button', { type: 'button', class: 'big-btn blue', onclick: () => { if (tapOk()) say(); } }, '🔊 もういちど'),
+        h('button', { type: 'button', class: 'big-btn go', onclick: () => { if (!tapOk()) return; const p = cur(); p.log.push({ t: Date.now(), card: c.t }); persist(); renderCards(); } }, '✓ つたえた'),
+        h('button', { type: 'button', class: 'mid-btn', onclick: () => { if (tapOk()) renderCards(); } }, '◀ もどる'))]);
+    say();
+  }
+
+  /* ============================================================
+     びょういん れんしゅう
+     ============================================================ */
+  function renderRehList() {
+    screen = 'rehs'; const p = cur();
+    setView('home', [h('h1', { class: 'title' }, '🎒 どこに いく れんしゅう？'),
+      h('div', { class: 'menu' }, REH.map(r => h('button', { type: 'button', class: 'mcard', style: '--c:#1C7ED6', onclick: () => { if (tapOk()) { sfx.tap(); startReh(r.id); } } }, E(r.e), h('b', null, r.n), h('small', null, p.reh[r.id] ? '⭐ ' + p.reh[r.id] + 'かい れんしゅう した' : r.steps.length + 'つの ばめん')))),
+      h('div', { class: 'actions' }, h('button', { type: 'button', class: 'mid-btn', onclick: () => { if (tapOk()) renderHome(); } }, '◀ もどる'))]);
+  }
+  let RH = null;
+  function startReh(id) { RH = { r: REH.find(x => x.id === id), i: 0 }; keepAwake(); renderReh(); }
+  function renderReh(back) {
+    screen = 'reh';
+    const st = RH.r.steps[RH.i], last = RH.i === RH.r.steps.length - 1;
+    const act = h('div', { class: 'act' });
+    const nextB = h('button', { type: 'button', class: 'big-btn go', onclick: () => { if (!tapOk(500)) return; if (last) finishReh(); else { RH.i++; sfx.step(); renderReh(); } } }, last ? '⭐ できた！' : 'つぎ ▶');
+    setView('step', [
+      h('div', { class: 'sdots' }, RH.r.steps.map((_, k) => h('i', { class: k <= RH.i ? 'on' : '' }))),
+      h('div', { class: 'rh' }, pic({ emoji: st[0] }), h('div', null, h('div', { class: 't' }, st[1]), st[2] ? h('div', { class: 'do' }, '👉 ' + st[2]) : null, act)),
+      h('div', { class: 'actions' }, h('button', { type: 'button', class: 'mid-btn', disabled: RH.i === 0, onclick: () => { if (tapOk() && RH.i > 0) { RH.i--; renderReh(); } } }, '◀ まえ'), nextB)]);
+    speak(st[1] + (st[2] ? '。' + st[2] : ''), { end: () => after(300, () => runAct(st[3], act)) });
+    if (!S().voice) after(400, () => runAct(st[3], act));
+    if (last) { sfx.clear(); FX.small($('.rh .pic')); }
+  }
+  let actRun = 0;
+  function runAct(kind, box) {
+    if (!kind || !box.isConnected || box.childElementCount) return;
+    const id = ++actRun;
+    const btn = (t, fn) => h('button', { type: 'button', class: 'mid-btn', onclick: fn }, t);
+    if (kind === 'tell') { box.append(btn('🩹 いたい ところを つたえて みる', () => { const keep = RH; startTell(() => { RH = keep; renderReh(); }); })); return; }
+    if (kind === 'breath') {
+      const c = h('div', { class: 'breath' }, 'すって'); box.append(c, btn('🔁 もういちど', () => { box.innerHTML = ''; runAct(kind, box); }));
+      let n = 0; const cyc = () => { if (id !== actRun || !c.isConnected) return; if (n >= 6) { c.textContent = 'できた！'; return; } const inn = n % 2 === 0; c.classList.toggle('in', inn); c.textContent = inn ? 'すって' : 'はいて'; speak(inn ? 'すって' : 'はいて'); n++; after(3000, cyc); };
+      after(100, cyc); return;
+    }
+    if (kind === 'mouth' || kind === 'still' || kind === 'count') {
+      const N = kind === 'still' ? 5 : kind === 'count' ? 5 : 3, up = kind === 'count';
+      const lab = h('div', { style: 'font-size:clamp(20px,2.6vw,28px);font-weight:700' }, kind === 'mouth' ? '👄 あーん' : kind === 'still' ? '🧍 じっと…' : 'いっしょに かぞえよう');
+      const c = h('div', { class: 'cnt' }, up ? '' : String(N));
+      box.append(lab, c, btn('▶ もういちど', () => { box.innerHTML = ''; runAct(kind, box); }));
+      let k = 0; const tick = () => { if (id !== actRun || !c.isConnected) return; k++; if (k > N) { c.textContent = '⭐'; lab.textContent = 'おしまい！'; sfx.ok(); speak('おしまい'); return; } c.textContent = String(up ? k : N - k + 1); tone(600 + k * 50, 0, .12, 'sine', .3); if (up) speak(String(k)); after(1000, tick); };
+      after(400, tick); return;
+    }
+    if (kind === 'beep') {
+      const lab = h('div', { style: 'font-size:22px;font-weight:700' }, '🎧 ピーが きこえたら ✋');
+      let on = false, t0 = 0;
+      const hb = h('button', { type: 'button', class: 'big-btn blue', onclick: () => { if (on) { on = false; sfx.ok(); lab.textContent = 'きこえたね！ ⭐'; } else lab.textContent = 'まだ だよ。よく きいてね'; } }, '✋ きこえた');
+      box.append(lab, hb, btn('🔁 もういちど', () => { box.innerHTML = ''; runAct(kind, box); }));
+      after(1500 + Math.random() * 2500, () => { if (id !== actRun) return; on = true; t0 = Date.now(); tone(1000, 0, .6, 'sine', .35); lab.textContent = '🎧 …'; });
+    }
+  }
+  function finishReh() {
+    const p = cur(); p.reh[RH.r.id] = (p.reh[RH.r.id] || 0) + 1; persist();
+    sfx.clear(); FX.big(); praise('よく がんばったね！');
+    after(1500, renderRehList);
+  }
+
+  /* ============================================================
+     せんせい：カードを ふやす
+     ============================================================ */
+  function openLib(onPick) {
+    const m = $('#libModal'), PN = $('#libPanel'); PN.innerHTML = '';
+    const close = () => m.classList.remove('open');
+    PN.append(h('div', { class: 'panel-head' }, h('h2', null, '🖼️ えを えらぶ'), h('button', { type: 'button', class: 'btn', onclick: close }, 'とじる')),
+      h('div', { class: 'btns' },
+        h('button', { type: 'button', class: 'btn primary', onclick: async () => { const fs = await pickFile('image/*', 'environment'); if (!fs) return; const id = await savePhoto(fs[0], 600); close(); onPick({ media: id }); } }, '📷 カメラで とる'),
+        h('button', { type: 'button', class: 'btn primary', onclick: async () => { const fs = await pickFile('image/*'); if (!fs) return; const id = await savePhoto(fs[0], 600); close(); onPick({ media: id }); } }, '🖼️ しゃしんを えらぶ')),
+      h('div', { class: 'lib' }, LIB.map(([g, list]) => [h('h4', null, g), list.map(([e, n]) => h('button', { type: 'button', onclick: () => { close(); onPick({ emoji: e, name: n }); } }, E(e), n))])));
+    m.classList.add('open'); m.scrollTop = 0;
+  }
+  $('#libModal').addEventListener('click', e => { if (e.target.id === 'libModal') $('#libModal').classList.remove('open'); });
+
+  /* ============================================================
+     プリント
+       cards … からだの カード（きって つかう）／ map … どこが いたい？ シート ／ log … つたえた きろく
+     ============================================================ */
+  const PF = '<div class="pf">© MieeL　からだ つたえる　www.mieel-support-school.com</div>';
+  const HD = (t, s, nm) => '<div class="phd"><h1>' + t + '</h1><small>' + (s || '') + '</small>' + (nm === false ? '' : '<div class="nm">なまえ ＿＿＿＿＿＿＿＿</div>') + '</div>';
+  const fmt = t => { const d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  async function buildPages(type, o) {
+    o = o || {};
+    if (type === 'cards') {
+      const list = o.set === 'mine' ? store.cards : cardsAll(), out = [];
+      for (let i = 0; i < Math.max(1, list.length); i += 6) {
+        let cells = '';
+        for (const c of list.slice(i, i + 6)) cells += '<div class="pc"><span class="ph">' + await picHTML(c.media ? c : { emoji: c.e }) + '</span><div class="t">' + esc(c.t) + '</div></div>';
+        out.push('<div class="ppage">' + HD('🏥 からだの カード', 'てんせんで きって つかいます', false) + '<div class="pcards">' + (cells || '<div class="pc"><div class="t">カードが ありません</div></div>') + '</div>' + PF + '</div>');
+      }
+      return out;
+    }
+    if (type === 'map') {
+      return ['<div class="ppage">' + HD('🩹 どこが いたい？', 'あてはまる ものに ○') +
+        '<div style="display:flex;justify-content:space-around;font-size:4.5mm;margin-top:2mm"><span>まえ</span><span>うしろ</span></div>' +
+        '<div class="pmap"><div>' + bodySVG('front') + '</div><div>' + bodySVG('back') + '</div></div>' +
+        '<div style="font-size:5mm;margin-top:3mm;font-weight:700">どんな かんじ？</div><div class="pmw">' + FEELS.map(f => '<span>' + f[1] + ' ' + f[2] + '</span>').join('') + '</div>' +
+        '<div style="font-size:5mm;margin-top:3mm;font-weight:700">どのくらい？</div><div class="psc">' + SCALE.map((s, i) => '<div><span class="pe">' + s[0] + '</span>' + i + ' ' + s[1] + '</div>').join('') + '</div>' +
+        '<div class="pmw" style="margin-top:3mm"><b style="font-size:5mm">いつから？</b>' + WHEN.map(w => '<span>' + w[1] + '</span>').join('') + '</div>' + PF + '</div>'];
+    }
+    // きろく
+    const p = store.profiles.find(x => x.id === o.pid) || cur();
+    const rows = p.log.slice().reverse().slice(0, Number(o.n) || 20);
+    const tr = rows.map(r => '<tr><td>' + fmt(r.t) + '</td><td>' + (r.card ? '🏥 ' + esc(r.card) : esc(PARTS[r.part] || '') + ((FEELS.find(f => f[0] === r.feel) || [])[2] ? '・' + FEELS.find(f => f[0] === r.feel)[2] : '')) + '</td><td>' + (r.scale == null ? '' : SCALE[r.scale][0] + ' ' + r.scale) + '</td><td>' + (r.when == null ? '' : WHEN[r.when][1]) + '</td><td style="width:40mm"></td></tr>').join('');
+    const trs = tr ? tr.split('</tr>').filter(Boolean).map(x => x + '</tr>') : ['<tr><td colspan="5">まだ きろくが ありません</td></tr>'], out = [];
+    for (let i = 0; i < trs.length; i += 20) out.push('<div class="ppage">' + HD('📋 からだの きろく（' + esc(p.name) + '）', 'さいきんの ' + rows.length + 'けん' + (trs.length > 20 ? '　' + (i / 20 + 1) + '/' + Math.ceil(trs.length / 20) : ''), false) +
+      '<table class="plog"><tr><th style="width:28mm">にちじ</th><th>つたえた こと</th><th style="width:18mm">いたさ</th><th style="width:25mm">いつから</th><th style="width:48mm">メモ（たいおん など）</th></tr>' + trs.slice(i, i + 20).join('') + '</table>' + PF + '</div>');
+    return out;
+  }
+  window.MieelPrintAPI = {
+    version: 1, fixed: true,
+    app: { id: 'karada-tsutaeru', title: 'からだ つたえる', icon: '🩺' },
+    list() {
+      return [
+        { id: 'map', name: 'どこが いたい？ シート', icon: '🩹', params: [] },
+        { id: 'cards', name: 'からだの カード', icon: '🏥', params: store.cards.length ? [{ key: 'set', label: 'カード', opts: [['all', 'ぜんぶ'], ['mine', 'ふやした カード']], def: 'all' }] : [] },
+        { id: 'log', name: 'からだの きろく', icon: '📋', params: [{ key: 'pid', label: '子ども', opts: store.profiles.map(p => [p.id, p.name]), def: cur().id }, { key: 'n', label: 'けんすう', opts: [[20, '20けん'], [40, '40けん（2まい）']], def: 20 }] }
+      ];
+    },
+    build(id, params) { return buildPages(id, params).then(pages => ({ pages, css: document.querySelector('style').textContent })); }
+  };
+
+  /* ============================================================
+     先生用せってい
+     ============================================================ */
+  APP.renderSettings = function (add, st, vp, pidSel) {
+    add(h('h3', null, '🩹 つたえかた'),
+      srow('よびかけ', seg(st.to, [['せんせい', 'せんせい'], ['おかあさん', 'おかあさん'], ['', 'なし']], v => setS('to', v)), 'つたえる カードの はじめの ことば'),
+      chk('「どんな かんじ？」を きく', 'askFeel'),
+      chk('「いつから？」を きく', 'askWhen'));
+    add(h('h3', null, '🏥 カードを ふやす'),
+      store.cards.length ? store.cards.map((c, i) => h('div', { class: 'prow' }, h('button', { type: 'button', class: 'mini-btn', onclick: () => openLib(r => { if (r.media) { c.media = r.media; } else { c.e = r.emoji; c.media = null; } persist(); refreshSettings(); }) }, c.media ? '📷' : E(c.e)),
+        h('input', { type: 'text', value: c.t, style: 'flex:1;min-width:140px', oninput: e => { c.t = e.target.value; persistSoon(); } }),
+        h('button', { type: 'button', class: 'mini-btn warn', onclick: () => { store.cards.splice(i, 1); persist(); cleanMedia(); refreshSettings(); } }, 'けす'))) : h('p', { class: 'note' }, 'その 子に あわせた カード（「めがねが いたい」「イヤーマフが ほしい」など）を ふやせます。しゃしんも つかえます。'),
+      h('div', { class: 'btns' }, h('button', { type: 'button', class: 'btn primary', onclick: () => openLib(r => { store.cards.push({ id: 'u' + uid(), e: r.emoji || '📷', media: r.media || null, t: r.name || 'あたらしい カード' }); persist(); refreshSettings(); }) }, '＋ カードを ふやす')));
+    add(h('h3', null, '📋 つたえた きろく'), pidSel());
+    const log = vp.log.slice().reverse().slice(0, 40);
+    add(log.length ? h('table', { class: 'rec-table' }, h('tr', null, ['日時', 'つたえた こと', 'いたさ', 'いつから'].map(x => h('th', null, x))),
+      log.map(r => h('tr', null, h('td', null, fmt(r.t)), h('td', null, r.card ? '🏥 ' + r.card : (PARTS[r.part] || '') + ((FEELS.find(f => f[0] === r.feel) || [])[2] ? '・' + FEELS.find(f => f[0] === r.feel)[2] : '')), h('td', null, r.scale == null ? '' : SCALE[r.scale][0] + ' ' + r.scale), h('td', null, r.when == null ? '' : WHEN[r.when][1])))) : h('p', { class: 'note' }, 'まだ きろくが ありません。'),
+      h('p', { class: 'note' }, 'プリント（🖨️）の「からだの きろく」で いんさつ できます。'));
+  };
+  if (TEST) window.__kd = { store: () => store, startTell, startReh, T: () => T, persist, renderCards };
+  startApp();
+  cleanMedia();
+
+})();
+</script>
+</body>
+</html>
