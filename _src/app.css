@@ -18,6 +18,8 @@
   .bodies svg { width: 100%; height: 100%; max-height: 66vh; flex: 1; min-height: 0; }
   svg .pt { fill: #FFE3C8; stroke: #D9A47A; stroke-width: 2.5; cursor: pointer; transition: fill .15s; }
   svg .pt.f { fill: #FFD3B0; }
+  svg .pt.f2 { fill: rgba(255, 211, 176, .25); stroke: #EBC3A3; stroke-dasharray: 3 3; stroke-width: 1.5; }
+  .pmap .pt.f2 { fill: #fff; stroke: #bbb; }
   svg .pt:hover { fill: #FFC9A0; }
   svg .pt.on { fill: #FF6B6B; stroke: #C92A2A; animation: throb 1s ease-in-out infinite; }
   @keyframes throb { 50% { fill: #FFA8A8; } }

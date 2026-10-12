@@ -209,6 +209,8 @@
   .bodies svg { width: 100%; height: 100%; max-height: 66vh; flex: 1; min-height: 0; }
   svg .pt { fill: #FFE3C8; stroke: #D9A47A; stroke-width: 2.5; cursor: pointer; transition: fill .15s; }
   svg .pt.f { fill: #FFD3B0; }
+  svg .pt.f2 { fill: rgba(255, 211, 176, .25); stroke: #EBC3A3; stroke-dasharray: 3 3; stroke-width: 1.5; }
+  .pmap .pt.f2 { fill: #fff; stroke: #bbb; }
   svg .pt:hover { fill: #FFC9A0; }
   svg .pt.on { fill: #FF6B6B; stroke: #C92A2A; animation: throb 1s ease-in-out infinite; }
   @keyframes throb { 50% { fill: #FFA8A8; } }
@@ -333,27 +335,39 @@ function jaSay(t) {
      どこが いたい？（からだ マップ）→ どんな かんじ → どのくらい → いつから → つたえる カード
      ほけんしつ カード ／ びょういん・はいしゃ・けんしん・ちゅうしゃ の れんしゅう
      ============================================================ */
-  const PARTS = { head: 'あたま', eye: 'め', ear: 'みみ', nose: 'はな', mouth: 'くち', tooth: 'は', throat: 'のど', neck: 'くび', shoulder: 'かた', chest: 'むね', belly: 'おなか', back: 'せなか', waist: 'こし', butt: 'おしり', arm: 'うで', hand: 'て', leg: 'あし', knee: 'ひざ', foot: 'あしの さき', whole: 'からだ ぜんたい' };
+  const PARTS = { head: 'あたま', forehead: 'おでこ', eye: 'め', ear: 'みみ', nose: 'はな', cheek: 'ほっぺ', mouth: 'くち', tooth: 'は', chin: 'あご', throat: 'のど', neck: 'くび', shoulder: 'かた', chest: 'むね', belly: 'おなか', back: 'せなか', waist: 'こし', butt: 'おしり', arm: 'うで', elbow: 'ひじ', wrist: 'てくび', hand: 'て', finger: 'ゆび', thigh: 'もも', knee: 'ひざ', leg: 'すね', ankle: 'あしくび', foot: 'あし', heel: 'かかと', whole: 'からだ ぜんたい' };
+  // みぎ・ひだりの ある ところ
+  const BI = ['eye', 'ear', 'cheek', 'shoulder', 'arm', 'elbow', 'wrist', 'hand', 'finger', 'thigh', 'knee', 'leg', 'ankle', 'foot', 'heel'];
   // [ばしょ, かたち]（viewBox 0 0 300 520）
   const SH = {
     arms: [['arm', '<rect x="62" y="148" width="28" height="118" rx="14" transform="rotate(8 76 148)"/>'], ['arm', '<rect x="210" y="148" width="28" height="118" rx="14" transform="rotate(-8 224 148)"/>'],
-      ['hand', '<circle cx="62" cy="280" r="17"/>'], ['hand', '<circle cx="238" cy="280" r="17"/>']],
-    legs: [['leg', '<rect x="106" y="300" width="40" height="98" rx="18"/>'], ['leg', '<rect x="154" y="300" width="40" height="98" rx="18"/>'],
+      ['hand', '<circle cx="62" cy="280" r="17"/>'], ['hand', '<circle cx="238" cy="280" r="17"/>'],
+      ['elbow', '<circle cx="68" cy="207" r="13"/>'], ['elbow', '<circle cx="232" cy="207" r="13"/>']],
+    legs: [['thigh', '<rect x="106" y="300" width="40" height="98" rx="18"/>'], ['thigh', '<rect x="154" y="300" width="40" height="98" rx="18"/>'],
       ['leg', '<rect x="108" y="418" width="36" height="66" rx="16"/>'], ['leg', '<rect x="156" y="418" width="36" height="66" rx="16"/>'],
       ['knee', '<circle cx="126" cy="406" r="18"/>'], ['knee', '<circle cx="174" cy="406" r="18"/>'],
-      ['foot', '<ellipse cx="118" cy="496" rx="27" ry="13"/>'], ['foot', '<ellipse cx="182" cy="496" rx="27" ry="13"/>']],
+      ['foot', '<ellipse cx="118" cy="496" rx="27" ry="13"/>'], ['foot', '<ellipse cx="182" cy="496" rx="27" ry="13"/>'],
+      ['ankle', '<circle cx="126" cy="481" r="9"/>'], ['ankle', '<circle cx="174" cy="481" r="9"/>']],
     front: [['belly', '<rect x="100" y="204" width="100" height="104" rx="22"/>'], ['chest', '<rect x="100" y="138" width="100" height="70" rx="22"/>'],
       ['shoulder', '<circle cx="98" cy="152" r="21"/>'], ['shoulder', '<circle cx="202" cy="152" r="21"/>'], ['throat', '<rect x="133" y="112" width="34" height="30" rx="9"/>'],
       ['ear', '<ellipse cx="97" cy="70" rx="11" ry="18"/>'], ['ear', '<ellipse cx="203" cy="70" rx="11" ry="18"/>'], ['head', '<circle cx="150" cy="64" r="52"/>'],
-      ['eye', '<ellipse cx="128" cy="58" rx="11" ry="9"/>', 1], ['eye', '<ellipse cx="172" cy="58" rx="11" ry="9"/>', 1], ['nose', '<ellipse cx="150" cy="78" rx="8" ry="10"/>', 1], ['mouth', '<ellipse cx="150" cy="99" rx="19" ry="8"/>', 1]],
+      ['eye', '<ellipse cx="128" cy="58" rx="11" ry="9"/>', 1], ['eye', '<ellipse cx="172" cy="58" rx="11" ry="9"/>', 1], ['nose', '<ellipse cx="150" cy="78" rx="8" ry="10"/>', 1], ['mouth', '<ellipse cx="150" cy="99" rx="19" ry="8"/>', 1],
+      ['forehead', '<ellipse cx="150" cy="30" rx="28" ry="11"/>', 2], ['cheek', '<circle cx="118" cy="84" r="9"/>', 2], ['cheek', '<circle cx="182" cy="84" r="9"/>', 2], ['chin', '<ellipse cx="150" cy="111" rx="13" ry="4.5"/>', 2]],
     back: [['butt', '<rect x="100" y="270" width="100" height="44" rx="22"/>'], ['waist', '<rect x="100" y="228" width="100" height="46" rx="16"/>'], ['back', '<rect x="100" y="138" width="100" height="94" rx="22"/>'],
       ['shoulder', '<circle cx="98" cy="152" r="21"/>'], ['shoulder', '<circle cx="202" cy="152" r="21"/>'], ['neck', '<rect x="133" y="112" width="34" height="30" rx="9"/>'],
-      ['ear', '<ellipse cx="97" cy="70" rx="11" ry="18"/>'], ['ear', '<ellipse cx="203" cy="70" rx="11" ry="18"/>'], ['head', '<circle cx="150" cy="64" r="52"/>']]
+      ['ear', '<ellipse cx="97" cy="70" rx="11" ry="18"/>'], ['ear', '<ellipse cx="203" cy="70" rx="11" ry="18"/>'], ['head', '<circle cx="150" cy="64" r="52"/>'],
+      ['heel', '<ellipse cx="124" cy="502" rx="12" ry="8"/>'], ['heel', '<ellipse cx="176" cy="502" rx="12" ry="8"/>']]
   };
-  function bodySVG(side, sel) {
-    const list = SH.arms.concat(SH.legs, SH[side]);
-    return '<svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">' + list.map(([p, s, f]) => s.replace(/^<(\w+)/, '<$1 class="pt' + (f ? ' f' : '') + (sel === p ? ' on' : '') + '" data-p="' + p + '"')).join('') +
-      (side === 'back' ? '<path d="M104 52 Q150 0 196 52 Q170 34 150 36 Q130 34 104 52Z" fill="#8B5E3C" opacity=".55" pointer-events="none"/>' : '') + '</svg>';
+  function bodySVG(side, sel, selSide) {
+    const list = SH.arms.concat(SH.legs, SH[side]), seen = {};
+    return '<svg viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg">' + list.map(([p, s, f]) => {
+      let lr = '';
+      if (BI.indexOf(p) >= 0) { const n = seen[p] = (seen[p] || 0) + 1; const viewerLeft = n % 2 === 1; lr = side === 'front' ? (viewerLeft ? 'みぎ' : 'ひだり') : (viewerLeft ? 'ひだり' : 'みぎ'); }
+      const on = sel === p && (!lr || !selSide || selSide === 'りょうほう' || selSide === 'わからない' || selSide === lr);
+      return s.replace(/^<(\w+)/, '<$1 class="pt' + (f === 2 ? ' f2' : f ? ' f' : '') + (on ? ' on' : '') + '" data-p="' + p + '"' + (lr ? ' data-s="' + lr + '"' : ''));
+    }).join('') +
+      (side === 'back' ? '<path d="M104 52 Q150 0 196 52 Q170 34 150 36 Q130 34 104 52Z" fill="#8B5E3C" opacity=".55" pointer-events="none"/>' : '') +
+      '<g font-size="17" font-weight="700" fill="#868E96" text-anchor="middle" pointer-events="none"><text x="26" y="330">' + (side === 'front' ? 'みぎ' : 'ひだり') + '</text><text x="274" y="330">' + (side === 'front' ? 'ひだり' : 'みぎ') + '</text></g></svg>';
   }
   const FEELS = [
     ['zuki', '💥', 'ずきずき', 'が ずきずき いたい', 'が ずきずき いたいです'],
@@ -365,11 +379,17 @@ function jaSay(t) {
     ['butsu', '💢', 'ぶつけた', 'を ぶつけた', 'を ぶつけました'],
     ['chi', '🩸', 'ちが でた', 'から ちが でた', 'から ちが でました'],
     ['hare', '🎈', 'はれて いる', 'が はれて いる', 'が はれて います'],
-    ['atsu', '🥵', 'あつい', 'が あつい', 'が あついです']
+    ['atsu', '🥵', 'あつい', 'が あつい', 'が あついです'],
+    ['gangan', '🔨', 'がんがん', 'が がんがん いたい', 'が がんがん いたいです'],
+    ['kiri', '🌪️', 'きりきり', 'が きりきり いたい', 'が きりきり いたいです'],
+    ['shibi', '⚡', 'しびれる', 'が しびれる', 'が しびれます'],
+    ['kurushi', '😮‍💨', 'くるしい', 'が くるしい', 'が くるしいです'],
+    ['shimiru', '💧', 'しみる', 'が しみる', 'が しみます'],
+    ['muzu', '🤧', 'むずむず', 'が むずむず する', 'が むずむず します']
   ];
   const SCALE = [['😀', 'いたくない', '#40C057'], ['🙂', 'すこし', '#82C91E'], ['😐', 'ちょっと いたい', '#FAB005'], ['😟', 'いたい', '#FD7E14'], ['😣', 'とても いたい', '#F76707'], ['😭', 'がまん できない', '#E03131']];
   const WHEN = [['⚡', 'いま', 'いま きゅうに'], ['⏱️', 'さっき', 'さっきから'], ['🌅', 'あさから', 'あさから'], ['🌙', 'きのうから', 'きのうから'], ['❓', 'わからない', '']];
-  const CARDS = [['🤢', 'きもちが わるい'], ['🤮', 'はきそう'], ['🥶', 'さむい'], ['🥵', 'あつい'], ['😪', 'ねむい'], ['😩', 'つかれた'], ['🤕', 'けがを した'], ['🩸', 'ちが でた'], ['🤧', 'はなみずが でる'], ['😷', 'せきが でる'], ['🌡️', 'ねつが ある かも'], ['🚻', 'トイレに いきたい'], ['💧', 'みずを のみたい'], ['🛏️', 'よこに なりたい'], ['🏥', 'ほけんしつに いきたい'], ['☎️', 'おうちに れんらく して'], ['💊', 'くすりの じかん'], ['👍', 'もう だいじょうぶ']].map((c, i) => ({ id: 'c' + i, e: c[0], t: c[1] }));
+  const CARDS = [['🤢', 'きもちが わるい'], ['🤮', 'はきそう'], ['🥶', 'さむい'], ['🥵', 'あつい'], ['😪', 'ねむい'], ['😩', 'つかれた'], ['🤕', 'けがを した'], ['🩸', 'ちが でた'], ['🤧', 'はなみずが でる'], ['😷', 'せきが でる'], ['🌡️', 'ねつが ある かも'], ['🚻', 'トイレに いきたい'], ['💧', 'みずを のみたい'], ['🛏️', 'よこに なりたい'], ['🏥', 'ほけんしつに いきたい'], ['☎️', 'おうちに れんらく して'], ['💊', 'くすりの じかん'], ['😵‍💫', 'めが まわる'], ['🫨', 'さむけが する'], ['😮‍💨', 'いきが くるしい'], ['🍙', 'おなかが すいた'], ['🥤', 'のどが かわいた'], ['🤕', 'ころんだ'], ['🦟', 'むしに さされた'], ['👃', 'はなぢが でた'], ['🩹', 'ばんそうこうが ほしい'], ['🧊', 'ひやしたい'], ['🎧', 'うるさくて つらい'], ['🌀', 'きもちが いっぱい'], ['🌸', 'せいりに なった'], ['👍', 'もう だいじょうぶ']].map((c, i) => ({ id: 'c' + i, e: c[0], t: c[1] }));
   // びょういん などの れんしゅう：[え, なにが おこる, どうする, うごき]
   const REH = [
     { id: 'byouin', e: '🏥', n: 'びょういん', steps: [
@@ -395,6 +415,38 @@ function jaSay(t) {
       ['🎧', 'ちょうりょく けんさ。ヘッドホンから ピーという おとが します。', 'きこえたら てを あげます。', 'beep'],
       ['🩺', 'ないか けんしん。おいしゃさんが ちょうしんきで むねの おとを ききます。', 'ふくを すこし あげて、しずかに いきを します。', 'breath'],
       ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'jibika', e: '👂', n: 'じびか（みみ・はな）', steps: [
+      ['🏥', 'じびかでは、みみや はなや のどを みて もらいます。', 'うけつけを して、まちあいしつで まちます。'],
+      ['🧑‍⚕️', 'おいしゃさんが、みみの なかを ライトで みます。', 'あたまを うごかさないで、じっと します。', 'still'],
+      ['👃', 'はなの なかを ほそい きかいで みたり、すったり します。すこし くすぐったいです。', 'くちで いきを して、5まで かぞえます。', 'count'],
+      ['👄', 'のどを みます。', '「あー」と こえを だして、くちを おおきく あけます。', 'mouth'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'ganka', e: '👁️', n: 'がんか（め）', steps: [
+      ['🏥', 'がんかでは、めを みて もらいます。', 'うけつけを して まちます。'],
+      ['🔭', 'きかいを のぞいて、なかの えを みます。', 'あごを だいに のせて、じっと みます。', 'still'],
+      ['💨', 'めに ふっと かぜが あたる ことが あります。びっくり するけど いたく ありません。', 'めを あけて まちます。'],
+      ['👁️', 'しりょく けんさ。わの あいて いる ほうを こたえます。', 'うえ・した・みぎ・ひだりを ゆびで さします。'],
+      ['💧', 'めぐすりを さす ことが あります。すこし つめたいです。', 'うえを みて、さしたら めを とじます。', 'count'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'saiketsu', e: '🩸', n: 'さいけつ（ちを とる）', steps: [
+      ['💺', 'さいけつでは、うでから すこし ちを とって しらべます。', 'いすに すわって、うでを だいに のせます。'],
+      ['🎗️', 'うでに ゴムを まきます。すこし きつく なります。', 'てを ぎゅっと にぎります。'],
+      ['🧴', 'アルコールで ふきます。つめたいです。', 'みたくない ときは、はんたいの ほうを むいて いいです。'],
+      ['📍', 'はりを さします。ちくっと します。', 'うごかないで、ゆっくり 10まで かぞえます。', 'count'],
+      ['🩹', 'おわったら ばんそうこうを はって、5ふん おさえます。', '「ありがとう ございました」と いいます。'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'xray', e: '🩻', n: 'レントゲン', steps: [
+      ['🩻', 'レントゲンは、からだの なかの ほねの しゃしんを とる きかいです。いたく ありません。', 'ぎしさんの いう とおりに うごきます。'],
+      ['👕', 'きんぞくの ついた ふくや アクセサリーは はずします。', 'きがえを します。'],
+      ['🧍', 'きかいに むねを つけて たちます。', '「いきを すって、とめて」と いわれたら、いきを とめます。', 'breath'],
+      ['⏸️', 'しゃしんを とる あいだ、うごかないで います。', 'すぐ おわります。', 'still'],
+      ['🌈', 'おしまい。よく がんばりました。'] ] },
+    { id: 'kusuri', e: '💊', n: 'くすりを のむ', steps: [
+      ['💊', 'びょうきを なおす ために、くすりを のみます。', 'コップに みずを よういします。'],
+      ['💧', 'さきに みずを ひとくち のんで、くちを ぬらします。', 'ごくんと のみます。'],
+      ['👅', 'くすりを したの うえに のせます。', 'すぐに みずを のみます。'],
+      ['⬆️', 'うえを むかないで、すこし したを むいて ごくんと のみます。', 'もういちど みずを のみます。', 'count'],
+      ['🌈', 'のめました。からだが げんきに なります。'] ] },
     { id: 'chusha', e: '💉', n: 'ちゅうしゃ', steps: [
       ['💉', 'よぼうせっしゅ（ちゅうしゃ）を します。', 'うでを だして すわります。'],
       ['🧴', 'アルコールで ふきます。すこし つめたいです。', 'うでを うごかさないで まちます。'],
@@ -895,9 +947,9 @@ const FX = (function () {
      どこが いたい？
      ============================================================ */
   let T = null;
-  const stepsOf = () => ['part'].concat(S().askFeel ? ['feel'] : [], ['scale'], S().askWhen ? ['when'] : [], ['tell']);
-  function startTell(ret) { T = { part: null, feel: null, scale: null, when: null, ret: ret || null }; keepAwake(); goStep('part'); }
-  function goStep(s) { ({ part: renderPart, feel: renderFeel, scale: renderScale, when: renderWhen, tell: renderTell })[s](); }
+  const stepsOf = () => ['part'].concat(T && T.part && BI.indexOf(T.part) >= 0 && T.askSide ? ['side'] : [], S().askFeel ? ['feel'] : [], ['scale'], S().askWhen ? ['when'] : [], ['tell']);
+  function startTell(ret) { T = { part: null, side: null, askSide: false, feel: null, scale: null, when: null, ret: ret || null }; keepAwake(); goStep('part'); }
+  function goStep(s) { ({ part: renderPart, side: renderSide, feel: renderFeel, scale: renderScale, when: renderWhen, tell: renderTell })[s](); }
   function nextStep() { const L = stepsOf(); goStep(L[L.indexOf(screen) + 1]); }
   function prevStep() { const L = stepsOf(), i = L.indexOf(screen); if (i <= 0) { if (T.ret) T.ret(); else renderHome(); } else goStep(L[i - 1]); }
   function shead(ask) {
@@ -907,20 +959,25 @@ const FX = (function () {
   }
   function renderPart() {
     screen = 'part';
-    const bodies = h('div', { class: 'bodies' }, ['front', 'back'].map(sd => h('div', { class: 'bd' }, h('b', null, sd === 'front' ? 'まえ' : 'うしろ'), h('div', { style: 'flex:1;min-height:0;width:100%;display:flex', html: bodySVG(sd, T.part) }))));
-    const choose = p => { if (!tapOk(300)) return; T.part = p; sfx.tap(); speak(PARTS[p]); renderPart(); after(900, nextStep); };
-    bodies.addEventListener('click', e => { const t = e.target.closest('[data-p]'); if (t) choose(t.getAttribute('data-p')); });
+    const bodies = h('div', { class: 'bodies' }, ['front', 'back'].map(sd => h('div', { class: 'bd' }, h('b', null, sd === 'front' ? 'まえ' : 'うしろ'), h('div', { style: 'flex:1;min-height:0;width:100%;display:flex', html: bodySVG(sd, T.part, T.side) }))));
+    // えを タッチ → みぎ・ひだりも わかる／ことばで えらぶ → あとで きく
+    const choose = (p, lr) => { if (!tapOk(300)) return; T.part = p; T.side = lr || null; T.askSide = !lr && BI.indexOf(p) >= 0; sfx.tap(); speak((lr ? lr + 'の ' : '') + PARTS[p]); renderPart(); after(900, nextStep); };
+    bodies.addEventListener('click', e => { const t = e.target.closest('[data-p]'); if (t) choose(t.getAttribute('data-p'), t.getAttribute('data-s')); });
     setView('step', [shead('どこが いたい？'), h('div', { class: 'mapwrap' }, bodies,
       h('div', { class: 'plist' }, Object.keys(PARTS).map(p => h('button', { type: 'button', class: T.part === p ? 'on' : '', onclick: () => choose(p) }, PARTS[p]))))]);
     if (!T.part) speak('どこが いたい？ からだの えを さわってね');
   }
+  function renderSide() {
+    optsScreen('side', PARTS[T.part] + '：みぎ？ ひだり？', [['✋', 'みぎ'], ['🤚', 'ひだり'], ['🙌', 'りょうほう'], ['❓', 'わからない']].map(o => h('button', { type: 'button', onclick: () => { if (!tapOk(400)) return; T.side = o[1]; sfx.tap(); speak(o[1]); after(700, nextStep); } }, E(o[0]), o[1])));
+  }
+  const partName = (part, side) => (side && side !== 'わからない' ? (side === 'りょうほう' ? 'りょうほうの ' : side + 'の ') : '') + (PARTS[part] || '');
   function optsScreen(name, ask, list, onPick, cls) {
     screen = name;
     setView('step', [shead(ask), h('div', { class: cls || 'opts' }, list)]);
     speak(ask);
   }
   function renderFeel() {
-    optsScreen('feel', PARTS[T.part] + 'は どんな かんじ？', FEELS.map(f => h('button', { type: 'button', onclick: () => { if (!tapOk(400)) return; T.feel = f[0]; sfx.tap(); speak(f[2]); after(700, nextStep); } }, E(f[1]), f[2])));
+    optsScreen('feel', partName(T.part, T.side) + 'は どんな かんじ？', FEELS.map(f => h('button', { type: 'button', onclick: () => { if (!tapOk(400)) return; T.feel = f[0]; sfx.tap(); speak(f[2]); after(700, nextStep); } }, E(f[1]), f[2])));
   }
   function renderScale() {
     screen = 'scale';
@@ -933,7 +990,7 @@ const FX = (function () {
     optsScreen('when', 'いつから？', WHEN.map((w, i) => h('button', { type: 'button', onclick: () => { if (!tapOk(400)) return; T.when = i; sfx.tap(); speak(w[1]); after(700, nextStep); } }, E(w[0]), w[1])));
   }
   function sentence(polite) {
-    const f = FEELS.find(x => x[0] === T.feel), p = PARTS[T.part] || 'からだ';
+    const f = FEELS.find(x => x[0] === T.feel), p = partName(T.part, T.side) || 'からだ';
     const body = f ? p + (polite ? f[4] : f[3]) : p + (polite ? 'が いたいです' : 'が いたい');
     return body;
   }
@@ -946,7 +1003,7 @@ const FX = (function () {
     };
     setView('step', [shead('これを みせて つたえよう'),
       h('div', { class: 'tell' }, h('div', { class: 'tcard', style: sc ? 'border-color:' + sc[2] : '' },
-        h('div', { html: bodySVG(['back', 'waist', 'butt', 'neck'].indexOf(T.part) >= 0 ? 'back' : 'front', T.part) }),
+        h('div', { html: bodySVG(['back', 'waist', 'butt', 'neck', 'heel'].indexOf(T.part) >= 0 ? 'back' : 'front', T.part, T.side) }),
         h('div', null, h('div', { class: 'msg' }, S().to ? [S().to + '、', h('br')] : null, sentence(false) + '。'),
           h('div', { class: 'meta' }, sc ? h('span', null, sc[0] + ' ' + T.scale + '：' + sc[1]) : null, w && T.when < 4 ? h('span', null, w[0] + ' ' + w[1]) : null)))),
       h('div', { class: 'actions' },
@@ -956,7 +1013,7 @@ const FX = (function () {
   }
   function logTell() {
     const p = cur();
-    p.log.push({ t: Date.now(), part: T.part, feel: T.feel, scale: T.scale, when: T.when });
+    p.log.push({ t: Date.now(), part: T.part, side: T.side, feel: T.feel, scale: T.scale, when: T.when });
     if (p.log.length > 1000) p.log.splice(0, p.log.length - 1000);
     persist();
   }
@@ -1082,7 +1139,7 @@ const FX = (function () {
     // きろく
     const p = store.profiles.find(x => x.id === o.pid) || cur();
     const rows = p.log.slice().reverse().slice(0, Number(o.n) || 20);
-    const tr = rows.map(r => '<tr><td>' + fmt(r.t) + '</td><td>' + (r.card ? '🏥 ' + esc(r.card) : esc(PARTS[r.part] || '') + ((FEELS.find(f => f[0] === r.feel) || [])[2] ? '・' + FEELS.find(f => f[0] === r.feel)[2] : '')) + '</td><td>' + (r.scale == null ? '' : SCALE[r.scale][0] + ' ' + r.scale) + '</td><td>' + (r.when == null ? '' : WHEN[r.when][1]) + '</td><td style="width:40mm"></td></tr>').join('');
+    const tr = rows.map(r => '<tr><td>' + fmt(r.t) + '</td><td>' + (r.card ? '🏥 ' + esc(r.card) : esc(partName(r.part, r.side)) + ((FEELS.find(f => f[0] === r.feel) || [])[2] ? '・' + FEELS.find(f => f[0] === r.feel)[2] : '')) + '</td><td>' + (r.scale == null ? '' : SCALE[r.scale][0] + ' ' + r.scale) + '</td><td>' + (r.when == null ? '' : WHEN[r.when][1]) + '</td><td style="width:40mm"></td></tr>').join('');
     const trs = tr ? tr.split('</tr>').filter(Boolean).map(x => x + '</tr>') : ['<tr><td colspan="5">まだ きろくが ありません</td></tr>'], out = [];
     for (let i = 0; i < trs.length; i += 20) out.push('<div class="ppage">' + HD('📋 からだの きろく（' + esc(p.name) + '）', 'さいきんの ' + rows.length + 'けん' + (trs.length > 20 ? '　' + (i / 20 + 1) + '/' + Math.ceil(trs.length / 20) : ''), false) +
       '<table class="plog"><tr><th style="width:28mm">にちじ</th><th>つたえた こと</th><th style="width:18mm">いたさ</th><th style="width:25mm">いつから</th><th style="width:48mm">メモ（たいおん など）</th></tr>' + trs.slice(i, i + 20).join('') + '</table>' + PF + '</div>');
@@ -1117,7 +1174,7 @@ const FX = (function () {
     add(h('h3', null, '📋 つたえた きろく'), pidSel());
     const log = vp.log.slice().reverse().slice(0, 40);
     add(log.length ? h('table', { class: 'rec-table' }, h('tr', null, ['日時', 'つたえた こと', 'いたさ', 'いつから'].map(x => h('th', null, x))),
-      log.map(r => h('tr', null, h('td', null, fmt(r.t)), h('td', null, r.card ? '🏥 ' + r.card : (PARTS[r.part] || '') + ((FEELS.find(f => f[0] === r.feel) || [])[2] ? '・' + FEELS.find(f => f[0] === r.feel)[2] : '')), h('td', null, r.scale == null ? '' : SCALE[r.scale][0] + ' ' + r.scale), h('td', null, r.when == null ? '' : WHEN[r.when][1])))) : h('p', { class: 'note' }, 'まだ きろくが ありません。'),
+      log.map(r => h('tr', null, h('td', null, fmt(r.t)), h('td', null, r.card ? '🏥 ' + r.card : partName(r.part, r.side) + ((FEELS.find(f => f[0] === r.feel) || [])[2] ? '・' + FEELS.find(f => f[0] === r.feel)[2] : '')), h('td', null, r.scale == null ? '' : SCALE[r.scale][0] + ' ' + r.scale), h('td', null, r.when == null ? '' : WHEN[r.when][1])))) : h('p', { class: 'note' }, 'まだ きろくが ありません。'),
       h('p', { class: 'note' }, 'プリント（🖨️）の「からだの きろく」で いんさつ できます。'));
   };
   if (TEST) window.__kd = { store: () => store, startTell, startReh, T: () => T, persist, renderCards };
